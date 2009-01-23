@@ -5,6 +5,9 @@ SRC = thesis.tex introduction.tex benchmark.tex typeparameters.tex applications.
 thesis.pdf : $(SRC)
 	latexmk -pdf -g $<
 
+%.tex : %.lagda
+	lhs2TeX --agda -o $@ $<
+
 %.tex : %.lhs
 	lhs2TeX -o $@ $<
 
