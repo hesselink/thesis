@@ -8,4 +8,6 @@
 *.ptb
 *.fdb_latexmk
 thesis.tex
-typeparameters.tex
+functorrep.tex
+oneparam.tex
+multiparam.tex

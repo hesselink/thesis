@@ -1,4 +1,4 @@
-SRC = thesis.tex introduction.tex benchmark.tex typeparameters.tex applications.tex
+SRC = thesis.tex introduction.tex benchmark.tex typeparameters.tex functorrep.tex oneparam.tex multiparam.tex applications.tex
 
 .PHONY : clean
 
@@ -17,3 +17,4 @@ preview :
 clean :
 	latexmk -CA
 	for file in $(SRC:%.tex=%.lhs); do if [ -e $$file ]; then rm -f $${file%lhs}tex; fi; done
+	rm -f thesis.ptb
