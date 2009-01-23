@@ -8,6 +8,9 @@ thesis.pdf : $(SRC)
 %.tex : %.lhs
 	lhs2TeX -o $@ $<
 
+preview :
+	latexmk -pdf -pvc thesis
+
 clean :
 	latexmk -CA
-	for file in $(SRC:%.tex=%.lhs); do if [ -e $$file ]; then rm -f $${file/%lhs/tex}; fi; done
+	for file in $(SRC:%.tex=%.lhs); do if [ -e $$file ]; then rm -f $${file%lhs}tex; fi; done
