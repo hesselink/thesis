@@ -52,6 +52,7 @@ from the pattern functor:
 fromNat  :: Nat -> PF Nat Nat
 fromNat Zero     = L (K ())
 fromNat (Suc n)  = R (I n)
+
 toNat    :: PF Nat Nat -> Nat
 toNat (L (K ()))  = Zero
 toNat (R (I n))   = Suc n
