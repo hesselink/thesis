@@ -1,5 +1,9 @@
 \documentclass[11pt, twoside, dvipdfm, a4paper, openright]{report}
+\usepackage{lmodern}
 %include polycode.fmt
+% if also including lagda, use the following instead, and rename to .lagda:
+%\def\textmu{}
+%%include agda.fmt
 \usepackage[a4paper]{geometry}
 \usepackage{natbib}
 \usepackage{hyperref}
