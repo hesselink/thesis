@@ -51,9 +51,9 @@ indicate which type parameter it is. This ensures that we don't change
 the order of the parameters.
 [TODO: clear up, example].
 
-As an example of the GADT that is stored with the parameters, let's
-consider representing a data type with two type parameters. The GADT
-will be as follows:
+As an example of the GADT that holds the parameters, let us consider
+representing a data type with two type parameters. The GADT will be as
+follows:
 
 \begin{code}
 data Zero
@@ -68,7 +68,8 @@ In essence, this is a container that can hold either |a|'s or |b|'s,
 and uses |Zero| and |Suc Zero| to indicate which one. In the type of
 the functors, |a| and |b| have been instantiated to concrete types by
 partially applying |Elems|, since it needs to have kind |* -> *|
-there.
+there. Note that we need one of these GADTs for each arity (number of
+type parameters).
 
 As a concrete example, consider a tree data type that stores one type
 of value in its leaves, and another in the branches:

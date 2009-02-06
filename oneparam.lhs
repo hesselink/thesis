@@ -99,12 +99,12 @@ over the original type by converting to the pattern functor, mapping
 over that, and converting back.
 
 The type class contains one function, |gmap'|. The second argument to
-this function, is the function you want to apply to all element in the
-functor (the third argument). The first argument is a function that we
-can apply to the recursive points. This is needed because our
+this function, is the function you want to apply to all elements in
+the functor (the third argument). The first argument is a function
+that we can apply to the recursive points. This is needed because our
 conversion to functors is only one level deep: at the recursive
-points, the original data type is stored, and we have to be able to do
-something with that. Later, in the top level function |gmap|, we will
+points, the original data type is stored, and we have to be able to
+convert it as well. Later, in the top level function |gmap|, we will
 ``tie the knot'' so that the user doesn't have to provide this
 function.
 
@@ -147,7 +147,8 @@ functor, mapping over that with |gmap'|, and converting the result
 back to the original data type. Here, we also supply the function to
 apply at the recursive points: |gmap f|. Note that we could not apply
 this in the instance for |I|, since there we could not satisfy the |Ix
-r| and |GMap (PF r)| constraints.
+r| and |GMap (PF r)| constraints, since |r| is universally quantified
+in the class method |gmap'|.
 
 \begin{code}
 gmap :: (Ix r, GMap (PF r)) => (a -> b) -> r a -> r b
