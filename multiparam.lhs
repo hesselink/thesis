@@ -13,6 +13,8 @@
            , KindSignatures
            , EmptyDataDecls
            , MultiParamTypeClasses
+           , FlexibleContexts
+           , RankNTypes
            #-}
 \end{code}
 %endif
@@ -131,7 +133,7 @@ be provided by the user, because we will define a top level function
 
 \begin{code}
 class GMap f where
-    gmap' :: (forall n. es n -> es2 n) -> (a -> b) -> f es a -> f es2 b
+    gmap' :: (forall n. es n -> es2 n) -> (r -> r') -> f es r -> f es2 r'
 \end{code}
 
 We again give instances of this class for all our functors. For a |K|,
@@ -162,7 +164,7 @@ instance (GMap f, GMap g) => GMap (f :*: g) where
 
 Now we can define a generic map function. The context says, first of
 all, that the types that we map over, have to be instances of the
-|EIx| class, i.e. they can be converted to a pattern functor. This
+|Ix| class, i.e. they can be converted to a pattern functor. This
 pattern functor should then be an instance of the |GMap| class, so we
 can map over it. Finally, we require that the pattern functor of the
 starting type and the result type are the same. This means we can only
@@ -173,7 +175,7 @@ cannot see the type former anymore, since we have abstracted over its
 kind. The actual definition of the function stays the same as before.
 
 \begin{code}
-gmap ::  (EIx es a, EIx es2 b, GMap (PF a), PF a ~ PF b) => 
+gmap ::  (Ix es a, Ix es2 b, GMap (PF a), PF a ~ PF b) =>
          (forall n. es n -> es2 n) -> a -> b
 gmap f = to . gmap' f (gmap f) . from
 \end{code}
