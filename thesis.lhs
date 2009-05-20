@@ -1,5 +1,5 @@
 \documentclass[11pt, twoside, dvipdfm, a4paper, openright]{report}
-\usepackage{lmodern}
+\usepackage{pxfonts}
 %include polycode.fmt
 % if also including lagda, use the following instead, and rename to .lagda:
 %\def\textmu{}
