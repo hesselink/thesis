@@ -6,6 +6,7 @@
 %format :*: = "\otimes"
 %format ~ = "\sim"
 %format undefined = "\bot"
+%options ghci -fglasgow-exts
 %if style == newcode
 \begin{code}
 {-# LANGUAGE TypeFamilies
@@ -321,3 +322,233 @@ infixr 5 &
 gmapExample2 :: Tree Char Int
 gmapExample2 = gmap (apply $ chr & length) example
 \end{code}
+
+\subsection{Producers - generic zero}
+
+We can divide generic functions into three separate classes:
+consumers, transformers and producers. Consumers are functions that
+consume a type in a generic way, and output only a concrete type.
+Examples are the show function or (structural) equality. Transformers
+consume a type generically, but also produce a (possibly different)
+type generically. The |gmap| function that was discussed is an example
+of a transformer. The final class of functions are producers. These
+produce values of a type generically, with only concrete types as
+input. Examples are parsers, like the well-known |read| function, as
+well as test data generation.
+
+Writing one of each of these classes of functions is a good way to
+test the quality of a generic programming framework: it should be able
+to write all of these functions. So far, we have only written a
+transformer. We will now write a generic producer; producers can often
+highlight shortcomings of the implementation, since they do something
+interesting: they produce values `out of nowhere'.
+
+We will implement the `generic zero': a function that produces the
+smallest value of a datatype. For example, for lists, it would produce
+the empty list, and for |Maybe|, it would produce |Nothing|.
+
+We again define the function using a type class, |HZero|. It provides
+one function, |hzero|, which takes three arguments. The first is an
+element, polymorphic in the index, i.e. it is a producer of elements.
+The second is the value to put at the recursive position. We again do
+not ask the user to provide this, but will `tie the knot' later. The
+third is a boolean, which we will use in the case of a sum. 
+%if style == newcode
+\begin{code}
+{- This is a first try that doesn't work, so it is not compiled,
+   because we later define a class with the same name.
+\end{code}
+%endif
+\begin{code}
+class HZero f where
+  hzero :: (forall n. es n) -> r -> Bool -> f es r
+\end{code}
+
+The case for |K| already gives us a problem: where do we get the value
+to put inside? We define another type class for this: |Small|. This
+type class contains values that have a `small' value: numbers, for
+example, have |0|. We use this type class to generate the value inside
+a |K| constructor.
+
+%if style == newcode
+\begin{code}
+-}
+\end{code}
+%endif
+
+\begin{code}
+class Small a where
+  small :: a
+\end{code}
+
+%if style == newcode
+\begin{code}
+{- This is a first try that doesn't work, so it is not compiled,
+   because we later define a class with the same name.
+\end{code}
+%endif
+
+\begin{code}
+instance Small a => HZero (K a) where
+  hzero _ _ _ = K small
+\end{code}
+
+For elements, we use the first argument to |hzero|, and for recursive
+positions, the second. In essence, this postpones the problem of
+generating these values to a moment where we can solve it.
+
+\begin{code}
+instance HZero (E n) where
+  hzero e _ _ = E e
+
+instance HZero I where
+  hzero _ r _ = I r
+\end{code}
+
+Sums give us a choice: we can go either left or right, and the choice
+is completely arbitrary (though it is customary to have the smallest
+constructor on the left), so we abstract from this choice. We use the
+third, boolean argument to hzero to decide the sum constructor to use.
+The instance for products is entirely straightforward.
+
+\begin{code}
+instance (HZero f, HZero g) => HZero (f :+: g) where
+  hzero e r True  = L $ hzero e r True
+  hzero e r False = R $ hzero e r False
+
+instance (HZero f, HZero g) => HZero (f :*: g) where
+  hzero e r left = hzero e r left :*: hzero e r left
+\end{code}
+
+We can now define our top level function, which we will call |gleft|.
+This function will provide values for all the arguments to |hzero|.
+For the boolean, will choose |True| to take a left constructor at
+sums, since it is convention to have the smallest constructor on the
+left. For recursive positions, we can just call |gleft| again.
+However, we have no way to generate element, so we will leave it up to
+the caller to provide these.
+
+\begin{code}
+gleft :: (Ix a, HZero (PF a)) => (forall n. Es a n) -> a
+gleft f = to $ hzero f (gleft f) True
+\end{code}
+
+However, a problem arises when we try to call this function to
+generate, for example, a value of the |Tree| type defined earlier. It
+turns out to be impossible to give the element generator. The reason
+is that it is \emph{too polymorphic}: it says it can generate elements
+for all |n|, but actually, |n| can only be of natural number types
+(|Zero| and |Suc n|). The solution is to require a proof that |n| is a
+natural number type. We define this proof as follows:
+
+%if style == newcode
+\begin{code}
+-}
+\end{code}
+%endif
+
+\begin{code}
+data NatPrf :: * -> * where
+  PZ :: NatPrf Zero
+  PS :: NatPrf n -> NatPrf (Suc n)
+\end{code}
+
+This data type states that |Zero| is a natural number type, and that
+if |n| is a natural number type, then so is |Suc n|. By pattern
+matching on this type, we can also recover the actual value. This is
+another thing we need when generating values of |(:||:)|, because we
+need to decide whether to generate a |Z| or an |S| constructor.
+
+We also need to get a value of this proof at some point. Rather than
+having the user produce it, we can generate it using a type class. The
+type class |El| contains a proof that the index |ix| can be produced
+in |prf|. We also give two instances for the natural number types.
+
+\begin{code}
+class El prf ix where
+  proof :: prf ix
+
+instance El NatPrf Zero where
+  proof = PZ
+
+instance El NatPrf n => El NatPrf (Suc n) where
+  proof = PS proof
+\end{code}
+
+We can now give a new version of the |HZero| type class that is
+additionally parametrized over a proof that is passed to the element
+generating function. In the case for |E|, we require that the index be
+in |prf|, and use the |proof| function to generate the actual proof.
+The other cases are unchanged, and have no constraints on |prf|.
+
+\begin{code}
+class HZero prf f where
+  hzero :: (forall n. prf n -> es n) -> r -> Bool -> f es r
+ 
+instance Small a => HZero prf (K a) where
+  hzero _ _ _ = K small
+
+instance El prf n => HZero prf (E n) where
+  hzero e _ _ = E (e proof)
+
+instance HZero prf I where
+  hzero _ r _ = I r
+
+instance (HZero prf f, HZero prf g) => HZero prf (f :+: g) where
+  hzero e r True  = L $ hzero e r True
+  hzero e r False = R $ hzero e r False
+
+instance (HZero prf f, HZero prf g) => HZero prf (f :*: g) where
+  hzero e r left = hzero e r left :*: hzero e r left
+\end{code}
+
+We could now define a function to generate the elements by hand, but
+it is more convenient to do this with a type class again. This type
+class captures exactly the function we want to provide: it takes a
+proof that the index is a natural number, and produces an element at
+this position.
+
+\begin{code}
+class SmallEl es where
+  smallEl :: NatPrf n -> es n
+
+instance (Small a, SmallEl as) => SmallEl (a :|: as) where
+  smallEl PZ     = Z small
+  smallEl (PS p) = S (smallEl p)
+
+instance SmallEl Nil where
+  smallEl _ = Nil $ error "Nil generated in smallEl."
+\end{code}
+
+We can provide an instance for |(:||:)| by pattern matching on the
+proof to recover the index: if we are at index zero, we produce an
+actual value by calling |small|; if we are at a successor index, we
+add an |S| constructor and use |smallEl| again for the tail, with the
+proof we just unwrapped.
+
+We also have to give an instance for |Nil|, since an instance for the
+tail (|as|) is always required. However, we cannot give this instance,
+so we resort to calling |error|. It is not possible for this to be
+called in normal use of the generic functions; however, it can be
+called manually, for example: |smallEl PZ :: Nil Zero|.
+
+Using this type class for generating elements, we can now define an
+improved version of |gleft|. It calls |smallEl| to generate elements
+and calls itself recursively to generate recursive values.
+
+\begin{code}
+gleft :: forall a. (Ix a, HZero NatPrf (PF a), SmallEl (Es a)) => a
+gleft = to $ hzero smallEl gleft True
+\end{code}
+
+If we define suitable |Small| instances, we can now call, for example,
+|gleft :: Tree Int Bool| to produce \eval{gleft :: Tree Int Bool}.
+
+\begin{code}
+instance Small Int where
+  small = 0
+
+instance Small Bool where
+  small = False
+\end{code}
+
