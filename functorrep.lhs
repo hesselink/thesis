@@ -1,4 +1,5 @@
 \section{Functor representation}
+\label{sec:functorrep}
 %include polycode.fmt
 %format family = "\mathbf{family}"
 %format :+: = "\oplus"

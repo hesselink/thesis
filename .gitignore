@@ -1,4 +1,5 @@
 *.aux
+*.bak
 *.bbl
 *.blg
 *.log
@@ -11,3 +12,4 @@ thesis.tex
 functorrep.tex
 oneparam.tex
 multiparam.tex
+multirec.tex
