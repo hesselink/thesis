@@ -1,11 +1,12 @@
 \section{Arbitrary number of type parameters}
 %include polycode.fmt
 %include forall.fmt
+%if style /= newcode
 %format family = "\mathbf{family}"
 %format :+: = "\oplus"
 %format :*: = "\otimes"
 %format ~ = "\sim"
-%format undefined = "\bot"
+%endif
 %options ghci -fglasgow-exts
 %if style == newcode
 \begin{code}
@@ -353,16 +354,10 @@ element, polymorphic in the index, i.e. it is a producer of elements.
 The second is the value to put at the recursive position. We again do
 not ask the user to provide this, but will `tie the knot' later. The
 third is a boolean, which we will use in the case of a sum. 
-%if style == newcode
-\begin{code}
-{- This is a first try that doesn't work, so it is not compiled,
-   because we later define a class with the same name.
-\end{code}
-%endif
-\begin{code}
+\begin{spec}
 class HZero f where
   hzero :: (forall n. es n) -> r -> Bool -> f es r
-\end{code}
+\end{spec}
 
 The case for |K| already gives us a problem: where do we get the value
 to put inside? We define another type class for this: |Small|. This
@@ -370,40 +365,27 @@ type class contains values that have a `small' value: numbers, for
 example, have |0|. We use this type class to generate the value inside
 a |K| constructor.
 
-%if style == newcode
-\begin{code}
--}
-\end{code}
-%endif
-
 \begin{code}
 class Small a where
   small :: a
 \end{code}
 
-%if style == newcode
-\begin{code}
-{- This is a first try that doesn't work, so it is not compiled,
-   because we later define a class with the same name.
-\end{code}
-%endif
-
-\begin{code}
+\begin{spec}
 instance Small a => HZero (K a) where
   hzero _ _ _ = K small
-\end{code}
+\end{spec}
 
 For elements, we use the first argument to |hzero|, and for recursive
 positions, the second. In essence, this postpones the problem of
 generating these values to a moment where we can solve it.
 
-\begin{code}
+\begin{spec}
 instance HZero (E n) where
   hzero e _ _ = E e
 
 instance HZero I where
   hzero _ r _ = I r
-\end{code}
+\end{spec}
 
 Sums give us a choice: we can go either left or right, and the choice
 is completely arbitrary (though it is customary to have the smallest
@@ -411,14 +393,14 @@ constructor on the left), so we abstract from this choice. We use the
 third, boolean argument to hzero to decide the sum constructor to use.
 The instance for products is entirely straightforward.
 
-\begin{code}
+\begin{spec}
 instance (HZero f, HZero g) => HZero (f :+: g) where
   hzero e r True  = L $ hzero e r True
   hzero e r False = R $ hzero e r False
 
 instance (HZero f, HZero g) => HZero (f :*: g) where
   hzero e r left = hzero e r left :*: hzero e r left
-\end{code}
+\end{spec}
 
 We can now define our top level function, which we will call |gleft|.
 This function will provide values for all the arguments to |hzero|.
@@ -428,10 +410,10 @@ left. For recursive positions, we can just call |gleft| again.
 However, we have no way to generate element, so we will leave it up to
 the caller to provide these.
 
-\begin{code}
+\begin{spec}
 gleft :: (Ix a, HZero (PF a)) => (forall n. Es a n) -> a
 gleft f = to $ hzero f (gleft f) True
-\end{code}
+\end{spec}
 
 However, a problem arises when we try to call this function to
 generate, for example, a value of the |Tree| type defined earlier. It
@@ -440,12 +422,6 @@ is that it is \emph{too polymorphic}: it says it can generate elements
 for all |n|, but actually, |n| can only be of natural number types
 (|Zero| and |Suc n|). The solution is to require a proof that |n| is a
 natural number type. We define this proof as follows:
-
-%if style == newcode
-\begin{code}
--}
-\end{code}
-%endif
 
 \begin{code}
 data NatPrf :: * -> * where

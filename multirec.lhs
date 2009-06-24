@@ -2,10 +2,13 @@
 %include polycode.fmt
 %include forall.fmt
 %format family = "\mathbf{family}"
+%if style /= newcode
 %format :+: = "\oplus"
 %format :*: = "\otimes"
+%format :>: = "\rhd"
 %format ~ = "\sim"
-%format undefined = "\bot"
+%format phi = "\phi"
+%endif
 %options ghci -fglasgow-exts
 %if style == newcode
 \begin{code}

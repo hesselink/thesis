@@ -1,9 +1,11 @@
 \section{Type parameters}
 \long\def\ignore#1{}
 %include polycode.fmt
+%if style /= newcode
 %format family = "\mathbf{family}"
 %format :+: = "\oplus"
 %format :*: = "\otimes"
+%endif
 %if style == newcode
 \begin{code}
 {-# LANGUAGE TypeFamilies
@@ -17,13 +19,9 @@ Using this representation to represent types with type parameters,
 like |[a]|, is problematic. For example, let's say we want to
 represent the list datatype, which might be defined as:
 
-%This is a nasty hack, but it works.
-%format % = " "
-%if style /= newcode
-\begin{code}%
+\begin{spec}
 data [a] = [] | a : [a]
-\end{code}
-%endif
+\end{spec}
 
 If we try to represent this in our view, we have to use |K| for the
 elements. However, this means that it is not possible to define

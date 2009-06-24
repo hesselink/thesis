@@ -1,9 +1,11 @@
 \section{Functor representation}
 \label{sec:functorrep}
 %include polycode.fmt
+%if style /= newcode
 %format family = "\mathbf{family}"
 %format :+: = "\oplus"
 %format :*: = "\otimes"
+%endif
 %if style == newcode
 \begin{code}
 {-# LANGUAGE TypeFamilies
