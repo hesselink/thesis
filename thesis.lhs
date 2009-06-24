@@ -4,6 +4,10 @@
 % if also including lagda, use the following instead, and rename to .lagda:
 %\def\textmu{}
 %%include agda.fmt
+% special commands for correct spacing of "* where" in GADTs.
+\newcommand\plainwhere{\mathbf{where}}
+\newcommand\spacewhere{\;\plainwhere}
+\let\where\plainwhere
 \usepackage[a4paper]{geometry}
 \usepackage{natbib}
 \usepackage{hyperref}

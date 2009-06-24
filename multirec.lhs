@@ -8,6 +8,10 @@
 %format :>: = "\rhd"
 %format ~ = "\sim"
 %format phi = "\phi"
+% */where spacing magic
+%format where = "\where "
+%format * = "*\let\where\spacewhere "
+%format ) = ")\let\where\plainwhere "
 %endif
 %options ghci -fglasgow-exts
 %if style == newcode
@@ -34,7 +38,7 @@ unfortunate, as these occur frequently in practice.
 The approach used in the multirec library \cite{multirec} still uses a
 functor representation, but it can represent families of mutually
 recursive datatypes.  It does this by \emph{indexing} the recursive
-points with a type that indicated to which type in the family the
+points with a type that indicates to which type in the family the
 recursion goes.
 
 Consider the following functor types:
@@ -107,29 +111,29 @@ that a type is in our family of AST types:
 
 \begin{code}
 data AST :: * -> * where
-  Expr :: AST Expr
-  Decl :: AST Decl
-  Var  :: AST Var
+  Expr  :: AST Expr
+  Decl  :: AST Decl
+  Var   :: AST Var
 \end{code}
 
 We can use this data type when referring to the entire family. When we
-do, we'll refer to it as |phi|. Using this, we can define a type
-family for the pattern functor as we did earlier. This time, however,
-it gives the pattern functor for a family of types instead of a single
-type.
+do, we'll refer to it as |phi|. Using this data type, we can define a
+type family for the pattern functor as we did earlier. This time,
+however, it gives the pattern functor for a family of types instead of
+a single type.
 
 \begin{code}
 type family PF phi :: (* -> *) -> * -> *
 type instance PF AST = PFAST
 \end{code}
 
-We again choose a shallow embedding, which means we don't convert
+We choose a shallow embedding as before, which means we don't convert
 recursive values, but store them as is. We need a simple wrapper type
-for this, which we'll call |I0|. Using this, we can define the type
-class for families that can be represented generically. It is
+for this, which we'll call |I0|. Using the wrapper, we can define the
+type class for families that can be represented generically. It is
 parametrized by the family (e.g. the |AST| type defined earlier). It
-again contains conversion functions |from| and |to|. Each takes a
-value of |phi|, which restricts the type |ix| to one of the types in
+contains the familiar conversion functions |from| and |to|. Each takes
+a value of |phi|, which restricts the type |ix| to one of the types in
 the family.
 
 \begin{code}
@@ -143,14 +147,14 @@ class Fam phi where
 We can now give an instance of this type class for the types in the
 family |AST|. By pattern matching on the values of |AST|, we refine
 the type |ix| to one of |Expr|, |Decl| or |Var|, which allows us to
-pattern match on it. The combination of an indexed pattern functor
-and the tagging functor makes sure we choose the right part of the
-functor for each type. For example, if we were to start with |R (L|
-instead of |L| when converting an |Expr|, we'd get a type error. The
-pattern functor when choosing then right sum and then left is |Decl|.
-However, in the type signature of |from|, the pattern functor has
-index |ix|, which pattern matching on the |AST| value determined to be
-|Expr|.
+pattern match on it. The combination of an indexed pattern functor and
+the tagging functor makes sure we choose the right part of the functor
+for each type. For example, if we were to start with |R L| instead of
+|L| when converting an |Expr|, we'd get a type error. The pattern
+functor when choosing the right sum followed by a left sum is tagged
+with |Decl|.  However, in the type signature of |from|, the pattern
+functor has index |ix|, which pattern matching on the |AST| value
+determined to be |Expr|.
 
 \begin{code}
 instance Fam AST where
@@ -183,9 +187,9 @@ class HFunctor phi f where
 \end{code}
 
 Note that the function argument passed to |hmap| uses a rank-2 type.
-Since we again wish to restrict |ix| to only those types in the family
-|phi|, we add an explicit proof argument again. However, we also need
-to obtain this proof somehow when we call this function. Rather than
+Since we wish to restrict |ix| to only those types in the family
+|phi|, we add an explicit proof argument. However, we also need to
+obtain this proof somehow when we call this function. Rather than
 passing it along, we define a type class to generate proofs.
 
 \begin{code}

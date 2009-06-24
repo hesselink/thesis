@@ -6,6 +6,10 @@
 %format :+: = "\oplus"
 %format :*: = "\otimes"
 %format ~ = "\sim"
+% */where spacing magic
+%format where = "\where "
+%format * = "*\let\where\spacewhere "
+%format ) = ")\let\where\plainwhere "
 %endif
 %options ghci -fglasgow-exts
 %if style == newcode
@@ -24,14 +28,15 @@ import Data.Char(chr)
 \end{code}
 %endif
 
-What we want to do, is abstract over the number of type parameters a
-type former takes. This means also abstracting over the kind of the
-recursive positions. The idea is, to use numbers on the type level to
-indicate the number of type parameters, and to indicate which type
-parameter an element corresponds to.
+We want to abstract over the number of type parameters a type former
+takes. This means also abstracting over the kind of the recursive
+positions, since these have to take an arbitrary number of type
+parameters. The idea is, to use numbers on the type level to indicate
+the number of type parameters, and to indicate which type parameter an
+element corresponds to.
 
 In a dependently typed programming language, we can apply this idea
-directly. [TODO: How do I insert Agda code in here?]
+directly. \Todo{How do I insert Agda code in here?}
 
 In Haskell, we can represent this as follows: we use a GADT containing
 the types of all the elements. The constructors of this GADT hold a
@@ -55,8 +60,13 @@ infixr 6 :+:
 
 The type |a| in the type of |E| is the type level number, used to
 indicate which type parameter it is. This ensures that we don't change
-the order of the parameters.
-[TODO: clear up, example].
+the order of the parameters. Note that |r| has kind |*| again. Since
+we don't know how many type parameters the type we are representing
+takes, and we have no kind polymorphism available in Haskell, our only
+option is to refer to the fully applied type including all type
+parameters. For example, in the one element case, |r| could be |[]|,
+whereas now it would be |[a]|. 
+\Todo{clear up, example}
 
 As an example of the GADT that holds the parameters, let us consider
 representing a data type with two type parameters. The GADT will be as
@@ -73,10 +83,9 @@ data Elems :: * -> * -> * -> * where
 
 In essence, this is a container that can hold either |a|'s or |b|'s,
 and uses |Zero| and |Suc Zero| to indicate which one. In the type of
-the functors, |a| and |b| have been instantiated to concrete types by
-partially applying |Elems|, since it needs to have kind |* -> *|
-there. Note that we need one of these GADTs for each arity (number of
-type parameters).
+the functors, |Elems| will have been partially applied to two types,
+since it needs to have kind |* -> *| there. Note that we need one of
+these GADTs for each arity (number of type parameters).
 
 But we can do better. We can construct a GADT that can hold any number
 of parameters, and indicates their position with a (type level)
@@ -145,13 +154,13 @@ toTree (R (I l :*: E (S (Z b)) :*: I r))  = Branch l b r
 
 \subsection{Generic map}
 
-For this representation we also want to define a generic map function.
-We start by defining a type class again for data types that have a
-functor representation, and making |Tree| an instance. We define an
-associated type for the elements. We use an associated type instead of
-a multi parameter type class, because for the latter, the type of the
-elements is too free, and the compiler cannot select the right
-instance.
+For the representation of a datatype with an arbitrary number of type
+parameters, we also want to define a generic map function.  We start
+by defining a type class again for data types that have a functor
+representation, and making |Tree| an instance. We define an associated
+type for the elements. We use an associated type instead of a multi
+parameter type class, because for the latter, the type of the elements
+is too free, and the compiler cannot select the right instance.
 
 \begin{code}
 class Ix a where
@@ -229,13 +238,13 @@ gmap f = to . gmap' f (gmap f) . from
 
 To use this generic map, we have to supply it with a function that
 maps elements to new elements. This can be problematic, as we cannot
-do this inline because we are pattern matching on a GADT to recover
-information about the index. The simplest way to define a function to
-map over the elements, is to name it, and define it standalone. For
-example, say we have a tree of |Int| and |String|, and we want to map
-the |chr| and |length| function over them, turning it into a tree of
-|Char| and |Int|. We can define the function to map over the tree as
-follows:
+do this with an inline lambda expression, because we are pattern
+matching on a GADT to recover information about the index. The
+simplest way to define a function to map over the elements, is to name
+it, and define it standalone. For example, say we have a tree of |Int|
+and |String|, and we want to map the |chr| and |length| function over
+them, turning it into a tree of |Char| and |Int|. We can define the
+function to map over the tree as follows:
 
 \begin{code}
 f :: (Int :|: String :|: Nil) n -> (Char :|: Int :|: Nil) n
@@ -281,14 +290,14 @@ instance (a ~ a', Apply fs es) => Apply (a -> b, fs) (a' :|: es) where
 \end{code}
 
 If we can apply |fs| to |es|, then we can also apply |(a -> b, fs)| to
-|a' :||: es|. We do this by pattern matching on |Z| and |S|, thus
-recovering the type index. If we have a |Z|, we know that it contains
-an element of type |a'|, and we can apply the function |f| to it. If
-we have an |S|, it contains something of type |es|, and we can apply
-|fs| to that due to the context |Apply fs es|. The result type can be
-calculated as the result type of the head of the list (which is just
-function application) followed by the result type of the application
-of the tail of the list.
+|a' :||: es|, provided that |a ~ a'|. We do this by pattern matching
+on |Z| and |S|, thus recovering the type index. If we have a |Z|, we
+know that it contains an element of type |a'|, and we can apply the
+function |f| to it. If we have an |S|, it contains something of type
+|es|, and we can apply |fs| to that due to the context |Apply fs es|.
+The result type can be calculated as the result type of the head of
+the list (which is just function application) followed by the result
+type of the application of the tail of the list.
 
 Why don't we use the type |a| at the front of the list, and instead
 have |a'| and an equality constraint |a ~ a'|? This is needed to allow
@@ -346,14 +355,20 @@ interesting: they produce values `out of nowhere'.
 
 We will implement the `generic zero': a function that produces the
 smallest value of a datatype. For example, for lists, it would produce
-the empty list, and for |Maybe|, it would produce |Nothing|.
+the empty list, and for |Maybe|, it would produce |Nothing|. Some
+datatypes have no obvious smallest value; for example, |Bool|. In
+these cases, we make a choice to always either take the left or the
+right constructor. This choice will be configurable with a boolean
+parameter.
 
 We again define the function using a type class, |HZero|. It provides
 one function, |hzero|, which takes three arguments. The first is an
 element, polymorphic in the index, i.e. it is a producer of elements.
 The second is the value to put at the recursive position. We again do
 not ask the user to provide this, but will `tie the knot' later. The
-third is a boolean, which we will use in the case of a sum. 
+third is a boolean, which we will use in the case of a sum, as
+mentioned earlier. 
+
 \begin{spec}
 class HZero f where
   hzero :: (forall n. es n) -> r -> Bool -> f es r

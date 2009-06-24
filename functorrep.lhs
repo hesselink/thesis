@@ -14,6 +14,8 @@
 \end{code}
 %endif
 
+\Todo{Intro}
+
 A simple functor representation of data types uses four different data types:
 
 \begin{code}
@@ -29,9 +31,8 @@ are constants. The second represent the recursive positions in the
 data type. The third and fourth represent sums and products,
 respectively.
 
-To construct a pattern functor for a specific data type, you would
-construct one out of these base functors. For example, if we define
-Peano-style numerals:
+A pattern functor for a specific data type is expressed in terms of
+these base functors. For example, consider Peano-style numerals:
 
 \begin{code}
 data Nat = Zero | Suc Nat
@@ -46,10 +47,10 @@ type family (PF a) :: * -> *
 type instance PF Nat = K () :+: I
 \end{code}
 
-Here, we represent the data type as the sum of two constructors: a
-constant |()| (sometimes an extra base functor |U| is used for this)
-or a recursive position. We can also write conversion functions to and
-from the pattern functor:
+We represent the data type as the sum of two constructors: a constant
+|()| (sometimes an extra base functor |U| is used for this) or a
+recursive position. We can also write conversion functions to and from
+the pattern functor:
 
 \begin{code}
 fromNat  :: Nat -> PF Nat Nat

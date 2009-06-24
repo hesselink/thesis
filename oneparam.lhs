@@ -15,16 +15,16 @@
 \end{code}
 %endif
 
-Using this representation to represent types with type parameters,
-like |[a]|, is problematic. For example, let's say we want to
-represent the list datatype, which might be defined as:
+Using the functor representation to represent types with type
+parameters, like |[a]|, is problematic. For example, let's say we want
+to represent the list datatype, which might be defined as:
 
 \begin{spec}
 data [a] = [] | a : [a]
 \end{spec}
 
 If we try to represent this in our view, we have to use |K| for the
-elements. However, this means that it is not possible to define
+elements. However, this implies that it is not possible to define
 generic functions that operate on the elements of the list, since the
 type of the element is not visible in the type of |PF [a]|. Instead,
 we can add a new functor type to hold the elements, and parametrize
@@ -79,8 +79,8 @@ instance Ix [] where
 \end{code}
 
 Note that we are now only describing data types of kind |* -> *|.
-While it is possible to represent data type without elements in this
-view, it means adding a (phantom) type parameter to the data type.
+While it is possible to represent a data type without elements in this
+view, it means adding a (superfluous) type parameter to the data type.
 Furthermore, if we want to represent a data type with two different
 element types, for example a tree with one type of value in the
 branches and another in the leaves, we cannot do it in this
@@ -92,31 +92,30 @@ types we represent to |* -> * -> *|.
 
 To define a generic map functor, we define a type class |GMap|. We
 make all functors instance of this type class. When the pattern
-functor of a type is then an instance of this type class, we can map
-over the original type by converting to the pattern functor, mapping
-over that, and converting back.
+functor of a type is an instance of this type class, we can map over
+the original type by converting to the pattern functor, mapping over
+that, and converting back.
 
-The type class contains one function, |gmap'|. The second argument to
-this function, is the function you want to apply to all elements in
-the functor (the third argument). The first argument is a function
-that we can apply to the recursive points. This is needed because our
-conversion to functors is only one level deep: at the recursive
-points, the original data type is stored, and we have to be able to
-convert it as well. Later, in the top level function |gmap|, we will
-``tie the knot'' so that the user doesn't have to provide this
-function.
+The type class |GMap| contains one function, |gmap'|. The second
+argument to this function, is the function you want to apply to all
+elements in the functor (the third argument). The first argument is a
+function that we can apply to the recursive points. This is needed
+because our conversion to functors is only one level deep: at the
+recursive points, values of the original data type are stored, and we
+have to be able to convert these as well. Later, in the top level
+function |gmap|, we will ``tie the knot'' so that the user doesn't
+have to provide this function.
 
 \begin{code}
 class GMap f where
     gmap' :: (r a -> r b) -> (a -> b) -> f a r -> f b r
 \end{code}
 
-We can now give instances of this class for all our functors. For a
-|K|, we do nothing, and for an |I|, we apply the first argument to the
-recursive structure contained within. In the |E| case, we do the
-actual work, applying the function being mapped to an element. For the
-sum and product, we just propagate the function call to the next
-level.
+We give instances of this class for all our functors. For |K|, we do
+nothing, and for |I|, we apply the first argument to the recursive
+structure contained within. In the |E| case, we do the actual work,
+applying the function being mapped to an element. For the sum and
+product, we just propagate the function call to the next level.
 
 \begin{code}
 instance GMap (K a) where
@@ -144,9 +143,9 @@ this by first converting from the original data type to the pattern
 functor, mapping over that with |gmap'|, and converting the result
 back to the original data type. Here, we also supply the function to
 apply at the recursive points: |gmap f|. Note that we could not apply
-this in the instance for |I|, since there we could not satisfy the |Ix
-r| and |GMap (PF r)| constraints, since |r| is universally quantified
-in the class method |gmap'|.
+|gmap f| to |r| in the instance for |I|, since there we could not
+satisfy the |Ix r| and |GMap (PF r)| constraints, because |r| is
+universally quantified in the class method |gmap'|.
 
 \begin{code}
 gmap :: (Ix r, GMap (PF r)) => (a -> b) -> r a -> r b
