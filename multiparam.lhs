@@ -1,4 +1,5 @@
 \section{Arbitrary number of type parameters}
+\label{sec:multiparam}
 %include polycode.fmt
 %include forall.fmt
 %if style /= newcode

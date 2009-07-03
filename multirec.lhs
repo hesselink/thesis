@@ -1,4 +1,5 @@
 \section{Multirec: mutually recursive datatypes}
+\label{sec:multirec}
 %include polycode.fmt
 %include forall.fmt
 %format family = "\mathbf{family}"
@@ -129,15 +130,16 @@ type instance PF AST = PFAST
 
 We choose a shallow embedding as before, which means we don't convert
 recursive values, but store them as is. We need a simple wrapper type
-for this, which we'll call |I0|. Using the wrapper, we can define the
-type class for families that can be represented generically. It is
-parametrized by the family (e.g. the |AST| type defined earlier). It
-contains the familiar conversion functions |from| and |to|. Each takes
-a value of |phi|, which restricts the type |ix| to one of the types in
-the family.
+for this, which we'll call |I0|. We also define an unwrapping
+function, |unI0|. Using the wrapper, we can define the type class for
+families that can be represented generically. It is parametrized by
+the family (e.g. the |AST| type defined earlier). It contains the
+familiar conversion functions |from| and |to|. Each takes a value of
+|phi|, which restricts the type |ix| to one of the types in the
+family.
 
 \begin{code}
-data I0 a = I0 a
+data I0 a = I0 { unI0 :: a }
 
 class Fam phi where
   from  ::  phi ix  -> ix            -> PF phi I0 ix
@@ -230,4 +232,32 @@ instance HFunctor phi f => HFunctor phi (f :>: xi) where
   hmap f (Tag x) = Tag (hmap f x)
 \end{code}
 
-\Todo{Should I include an example use of |hmap| here?}
+We can use |hmap| to define other generic function. One example is |compos|
+\cite{DBLP:conf/icfp/BringertR06}. This function applies a transformation
+function to the children of a value. It is non-recursive, so the user has to
+call the function recursively himself. It works on the concrete types, not on
+the generic representation. By pattern matching on the proof terms, type
+information can be recovered.
+
+As an example of its use, the following function renames all variables in an
+expression by adding an underscore to their name:
+
+\begin{code}
+renameVar :: Expr -> Expr
+renameVar = renameVar' Expr
+  where
+    renameVar' :: AST ix -> ix -> ix
+    renameVar' Var  s  = s ++ "_"
+    renameVar' p    x  = compos renameVar' p x
+\end{code}
+
+The definition of |compos| is fairly straightforward. It converts the
+type to a generic representation, uses |hmap| to apply the provided
+function to all recursive positions, unwrapping the |I0| before
+applying and wrapping afterwards. Finally it converts back from the
+generic representation.
+
+\begin{code}
+compos :: (Fam phi, HFunctor phi (PF phi)) => (forall ix. phi ix -> ix -> ix) -> phi ix -> ix -> ix
+compos f p = to p . hmap (\p -> I0 . f p . unI0) . from p
+\end{code}
