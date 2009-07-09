@@ -2,18 +2,7 @@
 \label{sec:multirec}
 %include polycode.fmt
 %include forall.fmt
-%format family = "\mathbf{family}"
-%if style /= newcode
-%format :+: = "\oplus"
-%format :*: = "\otimes"
-%format :>: = "\rhd"
-%format ~ = "\sim"
-%format phi = "\phi"
-% */where spacing magic
-%format where = "\where "
-%format * = "*\let\where\spacewhere "
-%format ) = ")\let\where\plainwhere "
-%endif
+%include thesis.fmt
 %options ghci -fglasgow-exts
 %if style == newcode
 \begin{code}

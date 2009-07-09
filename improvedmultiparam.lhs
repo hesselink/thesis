@@ -1,12 +1,7 @@
 \section{Arbitrary number of type parameters}
 %include polycode.fmt
 %include forall.fmt
-%if style /= newcode
-%format family = "\mathbf{family}"
-%format :+: = "\oplus"
-%format :*: = "\otimes"
-%format ~ = "\sim"
-%endif
+%include thesis.fmt
 %if style == newcode
 \begin{code}
 {-# LANGUAGE TypeFamilies

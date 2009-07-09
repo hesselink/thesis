@@ -2,16 +2,7 @@
 \label{sec:multiparam}
 %include polycode.fmt
 %include forall.fmt
-%if style /= newcode
-%format family = "\mathbf{family}"
-%format :+: = "\oplus"
-%format :*: = "\otimes"
-%format ~ = "\sim"
-% */where spacing magic
-%format where = "\where "
-%format * = "*\let\where\spacewhere "
-%format ) = ")\let\where\plainwhere "
-%endif
+%include thesis.fmt
 %options ghci -fglasgow-exts
 %if style == newcode
 \begin{code}

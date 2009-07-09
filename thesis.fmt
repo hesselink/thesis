@@ -1,0 +1,13 @@
+%if style /= newcode
+%format family = "\mathbf{family}"
+%format :+: = "\oplus"
+%format :*: = "\otimes"
+%format <?> = "\varobar"
+%format :>: = "\rhd"
+%format ~ = "\sim"
+%format phi = "\phi"
+% */where spacing magic
+%format where = "\where "
+%format * = "*\let\where\spacewhere "
+%format ) = ")\let\where\plainwhere "
+%endif

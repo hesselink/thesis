@@ -1,15 +1,7 @@
 \section{Multirec with type parameters}
 %include polycode.fmt
 %include forall.fmt
-%format family = "\mathbf{family}"
-%if style /= newcode
-%format :+: = "\oplus"
-%format :*: = "\otimes"
-%format <?> = "\varobar"
-%format :>: = "\rhd"
-%format ~ = "\sim"
-%format phi = "\phi"
-%endif
+%include thesis.fmt
 %options ghci -fglasgow-exts
 %if style == newcode
 \begin{code}
