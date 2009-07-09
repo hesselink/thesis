@@ -338,14 +338,14 @@ gmapExample2 = gmap (apply $ chr & length) example
 
 We can divide generic functions into three separate classes:
 consumers, transformers and producers. Consumers are functions that
-consume a type in a generic way, and output only a concrete type.
-Examples are the show function or (structural) equality. Transformers
-consume a type generically, but also produce a (possibly different)
-type generically. The |gmap| function that was discussed is an example
-of a transformer. The final class of functions are producers. These
-produce values of a type generically, with only concrete types as
-input. Examples are parsers, like the well-known |read| function, as
-well as test data generation.
+consume a type in a generic way, and output a concrete type.  Examples
+are the show function or (structural) equality. Transformers consume a
+type generically, but also produce a (possibly different) type
+generically. The |gmap| function that was discussed is an example of a
+transformer. The final class of functions are producers. These produce
+values of a type generically, with only concrete types as input.
+Examples are parsers, like the well-known |read| function, as well as
+test data generation.
 
 Writing one of each of these classes of functions is a good way to
 test the quality of a generic programming framework: it should be able

@@ -5,6 +5,7 @@
 %if style /= newcode
 %format :+: = "\oplus"
 %format :*: = "\otimes"
+%format <?> = "\varobar"
 %format :>: = "\rhd"
 %format ~ = "\sim"
 %format phi = "\phi"
@@ -34,7 +35,7 @@ parameter to the functors. We can prevent this by exploiting the
 similarity between the indexed recursive position, and the indexed
 elements.
 
-We can combine two non-indexed types into a type the can hold either
+We can combine two non-indexed types into a type that can hold either
 type; this type is fittingly called |Either|. We can do something
 similar for indexed types. We will call this type |Case|, and just
 like |Either| has two constructors |Left| and |Right|, |Case| has
@@ -49,7 +50,7 @@ data Case :: (* -> *) -> (* -> *) -> (* -> *) where
   CR  :: r  ix -> Case l r (Right  ix)
 \end{code}
 
-Case itself is indexed, but not with the index |ix| of the type it
+|Case| itself is indexed, but not with the index |ix| of the type it
 contains, but with index |Left ix| or |Right ix|, depending on which
 constructor is used. This way, the type contains more information
 about which value is contained within. This grants us more type
@@ -100,7 +101,9 @@ for recursion to type |ix|. To make this clearer, we introduce two
 type synonyms |Elem| and |Rec| for |Left| and |Right|. We then adapt
 the type of the pattern functor. Notice how in the first alternative
 for |Expr|, we now have an |I (Elem Zero)| instead of a |K Int|,
-indicating that the type of the constants is no longer fixed.
+indicating that the constants in our expression language are now
+polymorphic, and their type is indicated by the first type parameter,
+instead of being fixed to |Int|
 
 \begin{code}
 type Elem  = Left
@@ -121,10 +124,10 @@ type family PF phi :: (* -> *) -> * -> *
 type instance PF AST = PFAST
 \end{code}
 
-We need an indexed type to hold the elements. However, since we only
-have one element type, we will use a simple wrapper type |E0| which
-ignores the index, instead of the more flexible but also more complex
-type from section \ref{sec:multiparam}.
+We need an indexed type to hold elements. However, since we only have
+one element type, we will use a simple wrapper type |E0| which ignores
+the index, instead of the more flexible but also more complex type
+from section \ref{sec:multiparam}.
 
 We parametrize the family index |AST| by the element collection. By
 partially applying this type later, we can fix the element type,
@@ -352,9 +355,18 @@ elements, we unwrap the |E0|, add one, and wrap again. We pass in Expr
 twice, once to indicate the input type, and once to indicate the
 output type.
 
-\Todo{Maybe changing the type is a better example?}
-
 \begin{code}
 addOne2 :: Num a => Expr a -> Expr a
 addOne2 = gmap (E0 . (+1) . unE0) Expr Expr
+\end{code}
+
+One thing we cannot do with |compos| is change the type of the
+elements in an expression, since the transformation function has type
+|a -> a|. Using |gmap| this is no problem. For example, the following
+function takes an expression of doubles, and rounds all constants to
+produce an expression of integers.
+
+\begin{code}
+roundExpr :: Expr Double -> Expr Integer
+roundExpr = gmap (E0 . round . unE0) Expr Expr
 \end{code}

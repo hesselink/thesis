@@ -27,10 +27,12 @@
 \end{code}
 %endif
 
-We want to apply the method we used in section \ref{sec:multiparam} to
-the representation for mutually recursive datatypes used in section
-\ref{sec:multirec}. However, there is a problem. We can see this if we
-look at the type we expect |gmap| to have in this representation:
+In section \ref{sec:multiparam} we used an indexed datatype to
+represent an arbitrary number of type parameters in the generic view
+on a single datatype.  We would like to apply this method to the
+representation for mutually recursive datatypes used in section
+\ref{sec:multirec}. However, there is a problem. This problem shows up
+in the type we expect |gmap| to have in this representation:
 
 \begin{spec}
 gmap ::  (Fam phi es, Fam phi es', GMap (PF phi)) => 
@@ -54,15 +56,14 @@ transform the recursive points. This function would be provided in
 |gmap|, and would itself be |gmap| again, surrounded by wrapping and
 unwrapping an |I0|. 
 
-Problems arise at the |I| instance. For example, if we are
-representing a list, a recursive position in the pattern functor will
-have the type |I [a]|. Now, when we map a function |a -> b| over it,
-\emph{the type will change} and become |I [b]|. The same problem would
-arise in the case for |(:>:)|. In fact, this means that |gmap| doesn't
-even type check, since the pattern functors for |a| and |b| are not
-the same, but |gmap'| requires them to be. We can add an equality
-constraint |a ~ b|, but then we cannot change the element type any
-more.
+A problem arises at the |I| instance. For example, if we represent a
+list, a recursive position in the pattern functor has the type |I
+[a]|. Now, when we map a function |a -> b| over it, \emph{the type
+will change} and become |I [b]|. The same problem arises in the case
+for |(:>:)|. In fact, this means that |gmap| doesn't even type check,
+since the pattern functors for |a| and |b| are not the same, but
+|gmap'| requires them to be. We can add an equality constraint |a ~
+b|, but then we cannot change the element type any more.
 
 A solution to this problem is to remove the concrete types from the
 pattern functor. Both the |I| and |(:>:)| type should no longer expose
@@ -235,9 +236,9 @@ calling |hmap| have to be changed, however, because the recursive
 positions are now wrapped in an |R0| instead of an |I0|. Since this
 type is existentially quantified, we cannot write an unwrapping
 function, and when pattern matching we have to add a type signature.
-This type signature universally quantified over some type variables,
-but not over all, which means we need scoped type variable, by turning
-on the ScopedTypeVariables extension to GHC.
+This type signature universally quantifies over some type variables,
+but not over all, which means we need scoped type variables, by
+turning on the ScopedTypeVariables extension to GHC.
 
 \begin{code}
 compos ::  forall phi a ix. (Fam phi, HFunctor (Proof phi) (PF phi)) => 
