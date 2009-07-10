@@ -157,7 +157,7 @@ is too free, and the compiler cannot select the right instance.
 \begin{code}
 class Ix a where
     type Es a :: * -> *
-    from  :: a          -> PF a (Es a) a
+    from  :: a              -> PF a (Es a) a
     to    :: PF a (Es a) a  -> a
 
 instance Ix (Tree a b) where
