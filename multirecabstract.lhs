@@ -185,7 +185,7 @@ We would like to keep using functions like |hmap| as we defined them
 before, but the kind of the proof argument |phi| has changed: it now
 takes an extra type |a|. The |a| isn't needed in generic functions
 like |hmap|, so we choose to hide it using another existential type,
-|Proof|. The |El| typeclass that produces proofs isn't changed, but
+|Proof|. The |El| type class that produces proofs isn't changed, but
 the instances now produce |Proof AST| terms for the abstract indices,
 instead of |AST| terms for concrete indices.
 

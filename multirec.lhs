@@ -57,7 +57,7 @@ describing are used to index the functors.
 So far, the index |ix| of the functor components is completely free:
 there is nothing constraining it. For this, we introduce a new
 building block: |(:>:)|. This constructor tags a functor with an
-index, indicating that this part of the functor descibes the indicated
+index, indicating that this part of the functor describes the indicated
 type in the family.
 
 \begin{code}
@@ -249,7 +249,7 @@ renameVar = renameVar' Expr
 The definition of |compos| is fairly straightforward. It converts the
 type to a generic representation, uses |hmap| to apply the provided
 function to all recursive positions, unwrapping the |I0| before
-applying and wrapping afterwards. Finally it converts back from the
+applying and wrapping afterward. Finally it converts back from the
 generic representation.
 
 \begin{code}

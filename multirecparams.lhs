@@ -139,7 +139,7 @@ data AST :: (knat -> *) -> kphi -> knat -> * where
 
 We extend |R0| with an extra type parameter to hold the element types.
 We then define the |Fam| type class again, using |Case| at the
-recusive position to allow both elements, and recursive values. In the
+recursive position to allow both elements, and recursive values. In the
 instance for |AST|, we use the case constructors |CL| for elements,
 and |CR| for recursive values.
 
