@@ -10,4 +10,11 @@
 %format where = "\where "
 %format * = "*\let\where\spacewhere "
 %format ) = ")\let\where\plainwhere "
+%format knat = "*_\mathbb{N}"
+%format kphi = "*_\phi"
+%format datakind = "\mathbf{datakind}"
+%format kl = "*_l"
+%format kr = "*_r"
+%format keitherlr = "*_{Either~l~r}"
+%format keithernn = "*_{Either~\mathbb{N}~\mathbb{N}}"
 %endif

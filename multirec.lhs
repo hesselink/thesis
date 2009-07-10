@@ -34,10 +34,10 @@ recursion goes.
 Consider the following functor types:
 
 \begin{code}
-data K a        (r :: * -> *) ix = K a
-data I xi       (r :: * -> *) ix = I (r xi)
-data (f :+: g)  (r :: * -> *) ix = L (f r ix) | R (g r ix)
-data (f :*: g)  (r :: * -> *) ix = f r ix :*: g r ix
+data K a             (r :: kphi -> *) (ix :: kphi) = K a
+data I (xi :: kphi)  (r :: kphi -> *) (ix :: kphi) = I (r xi)
+data (f :+: g)       (r :: kphi -> *) (ix :: kphi) = L (f r ix) | R (g r ix)
+data (f :*: g)       (r :: kphi -> *) (ix :: kphi) = f r ix :*: g r ix
 
 infixr 6 :+:
 infixr 8 :*:
@@ -50,6 +50,10 @@ parameter |xi|, which indicates which type to recurse on. Note that it
 differs from the functor index |ix|, which indicates which type we are
 currently describing.
 
+We have used kinds |kphi| instead of |*| to indicate that only a restricted
+subset of types is allowed. Only types from the family of datatypes we are
+describing are used to index the functors.
+
 So far, the index |ix| of the functor components is completely free:
 there is nothing constraining it. For this, we introduce a new
 building block: |(:>:)|. This constructor tags a functor with an
@@ -57,7 +61,7 @@ index, indicating that this part of the functor descibes the indicated
 type in the family.
 
 \begin{code}
-data (f :>: xi)  (r :: * -> *) ix where
+data (f :>: (xi :: kphi))  (r :: kphi -> *) (ix :: kphi) where
   Tag :: f r ix -> (f :>: ix) r ix
 \end{code}
 
@@ -94,13 +98,15 @@ type PFAST  =    (    K Int
             :+:       K String :>: Var
 \end{code}
 
-When writing a conversion function to |PFAST|, we need to define a
-function that takes either an |Expr|, a |Decl| or a |Var|, but no
-other types. To this end, we define a GADT that functions as a proof
-that a type is in our family of AST types:
+When writing a conversion function to |PFAST|, we need to define a function
+that takes either an |Expr|, a |Decl| or a |Var|, but no other types. Similar
+to section \ref{sec:multiparam}, we want to restrict the kind. This time we
+require an enumeration kind, containing the three types in our family. To this
+end, we define a GADT that functions as a proof that a type is in our family of
+AST types:
 
 \begin{code}
-data AST :: * -> * where
+data AST :: kphi -> * where
   Expr  :: AST Expr
   Decl  :: AST Decl
   Var   :: AST Var
@@ -113,7 +119,7 @@ however, it gives the pattern functor for a family of types instead of
 a single type.
 
 \begin{code}
-type family PF phi :: (* -> *) -> * -> *
+type family PF phi :: (kphi -> *) -> kphi -> *
 type instance PF AST = PFAST
 \end{code}
 

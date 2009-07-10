@@ -123,15 +123,18 @@ type PFAST  =    (    K Int
 We now change the GADT we used to prove membership of the family of
 datatypes to also hold the relation between the concrete and the
 abstract types. This changes its kind, and thus also the kind of |PF|,
-but that remains otherwise unchanged.
+which remains otherwise unchanged. Note that of the type arguments of |AST|,
+the first is a member of the family (indicated with |kphi|) and the second is a
+natural number type (indicated with |knat|). The pattern functor is now indexed
+by natural numbers instead of types in the family.
 
 \begin{code}
-data AST :: * -> * -> * where
+data AST :: kphi -> knat -> * where
   Expr  :: AST Expr  Zero
   Decl  :: AST Decl  (Suc Zero)
   Var   :: AST Var   (Suc (Suc Zero))
 
-type family PF phi :: (* -> *) -> * -> *
+type family PF phi :: (knat -> *) -> knat -> *
 type instance PF AST = PFAST
 \end{code}
 
@@ -152,12 +155,12 @@ positions. In the instance of |Fam|, we now have to provide the proof
 at all the recursive positions.
 
 \begin{code}
-data R0 :: (* -> * -> *) -> * -> * where
+data R0 :: (kphi -> knat -> *) -> knat -> * where
   R0 :: phi a ix -> a -> R0 phi ix
 
 class Fam phi where
-  from  ::  phi a ix  -> a            -> PF phi (R0 phi) ix
-  to    ::  phi a ix  -> PF phi (R0 phi) ix -> a
+  from  ::  phi a ix  -> a                   -> PF phi (R0 phi) ix
+  to    ::  phi a ix  -> PF phi (R0 phi) ix  -> a
 
 instance Fam AST where
   from  Expr  (Const i)    = L (Tag (L (K i)))
@@ -187,7 +190,7 @@ the instances now produce |Proof AST| terms for the abstract indices,
 instead of |AST| terms for concrete indices.
 
 \begin{code}
-data Proof :: (* -> * -> *) -> * -> * where
+data Proof :: (kphi -> knat -> *) -> knat -> * where
   Proof :: phi a ix -> Proof phi ix
 
 class El phi ix where

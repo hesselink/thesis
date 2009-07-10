@@ -37,17 +37,18 @@ constructors |CL| and |CR|.
 data Left ix
 data Right ix
 
-data Case :: (* -> *) -> (* -> *) -> (* -> *) where
+data Case :: (kl -> *) -> (kr -> *) -> (keitherlr -> *) where
   CL  :: l  ix -> Case l r (Left   ix)
   CR  :: r  ix -> Case l r (Right  ix)
 \end{code}
 
-|Case| itself is indexed, but not with the index |ix| of the type it
-contains, but with index |Left ix| or |Right ix|, depending on which
-constructor is used. This way, the type contains more information
-about which value is contained within. This grants us more type
-safety, and prevents us from having to define `impossible' cases for
-functions.
+|Case| itself is indexed, but not with the index |ix| of the type it contains,
+but with index |Left ix| or |Right ix|, depending on which constructor is used.
+As indicated, if the left and right types are indexed by types of kind |kl| and
+|kr| respectively, then |Case l r| is indexed by a type of kind |keitherlr|.
+This way, the type contains more information about which value is contained
+within. This grants us more type safety, and prevents us from having to define
+`impossible' cases for functions.
 
 % This code is the same as in the previous section, so it is not shown
 % in the pdf.
@@ -112,7 +113,7 @@ type PFAST  =    (    I (Elem Zero)
                  ) :>: (Suc Zero)
             :+:       K String :>: (Suc (Suc Zero))
 
-type family PF phi :: (* -> *) -> * -> *
+type family PF phi :: (knat -> *) -> knat -> *
 type instance PF AST = PFAST
 \end{code}
 
@@ -130,7 +131,7 @@ us to indicate with type is used in which position of which type.
 \begin{code}
 data E0 a ix = E0 { unE0 :: a }
 
-data AST :: (* -> *) -> * -> * -> * where
+data AST :: (knat -> *) -> kphi -> knat -> * where
   Expr  :: AST (E0 a) (Expr a)  Zero
   Decl  :: AST (E0 a) (Decl a)  (Suc Zero)
   Var   :: AST (E0 a) Var       (Suc (Suc Zero))
@@ -143,7 +144,7 @@ instance for |AST|, we use the case constructors |CL| for elements,
 and |CR| for recursive values.
 
 \begin{code}
-data R0 :: ((* -> *) -> * -> * -> *) -> (* -> *) -> * -> * where
+data R0 :: ((knat -> *) -> * -> knat -> *) -> (knat -> *) -> knat -> * where
   R0 :: phi es a ix -> a -> R0 phi es ix
 
 class Fam phi es where
@@ -231,7 +232,7 @@ instance El pl ix => El (Case pl pr) (Left ix) where
 instance El pr ix => El (Case pl pr) (Right ix) where
   proof = CR proof
 
-type FamPrf phi (es :: * -> *) = Case NatPrf (Proof (phi es))
+type FamPrf phi (es :: knat -> *) = Case NatPrf (Proof (phi es))
 \end{code}
 
 % This code is the same as in the previous section, so it is not shown

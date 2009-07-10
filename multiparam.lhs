@@ -427,11 +427,23 @@ generate, for example, a value of the |Tree| type defined earlier. It
 turns out to be impossible to give the element generator. The reason
 is that it is \emph{too polymorphic}: it says it can generate elements
 for all |n|, but actually, |n| can only be of natural number types
-(|Zero| and |Suc n|). The solution is to require a proof that |n| is a
-natural number type. We define this proof as follows:
+(|Zero| and |Suc n|). In essence, the kind of |Es a| is not |* -> *|,
+but |knat -> *|, where we use |knat| to indicate a kind that is
+restricted the natural number types. We would like a Haskell syntax to
+define kinds like this:
+
+\begin{spec}
+datakind Nat = Zero | Suc Nat
+data Es a (ix :: Nat)
+\end{spec}
+
+Another option would be to define the type on the value level, and \emph{lift}
+it to the type level. See for example `she' by Conor McBride \cite{web:she}.
+The solution we use here, is to require a proof that |n| is a natural number
+type to be passed. We define this proof as follows:
 
 \begin{code}
-data NatPrf :: * -> * where
+data NatPrf :: knat -> * where
   PZ :: NatPrf Zero
   PS :: NatPrf n -> NatPrf (Suc n)
 \end{code}
