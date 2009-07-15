@@ -18,3 +18,11 @@
 %format keitherlr = "*_{Either~l~r}"
 %format keithernn = "*_{Either~\mathbb{N}~\mathbb{N}}"
 %endif
+%if style == newcode
+%format knat = "*"
+%format kphi = "*"
+%format kl = "*"
+%format kr = "*"
+%format keitherlr = "*"
+%format keithernn = "*"
+%endif
