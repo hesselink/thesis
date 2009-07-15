@@ -17,6 +17,8 @@
 %format kr = "*_r"
 %format keitherlr = "*_{Either~l~r}"
 %format keithernn = "*_{Either~\mathbb{N}~\mathbb{N}}"
+%format ... = "\ldots"
+%format :.: = "\;\odot\;"
 %endif
 %if style == newcode
 %format knat = "*"

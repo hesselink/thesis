@@ -2,7 +2,7 @@
 %include polycode.fmt
 %include forall.fmt
 %include thesis.fmt
-%options ghci -fglasgow-exts
+%options ghci -fglasgow-exts -pgmL lhs2tex -optL --pre
 %if style == newcode
 \begin{code}
 {-# LANGUAGE TypeFamilies
@@ -362,4 +362,104 @@ produce an expression of integers.
 \begin{code}
 roundExpr :: Expr Double -> Expr Integer
 roundExpr = gmap (E0 . round . unE0) Expr Expr
+\end{code}
+
+\subsection{Deep embedding}
+
+So far, we have used a shallow embedding: at the recursive positions,
+we store the original datatype, instead of its generic representation.
+For some applications, it can be more convenient to work with a deep
+embedding, where the entire datatype is converted to a generic
+representation.
+
+When we have functors of kind |* -> *| as in section
+\ref{sec:functorrep}, we use the well-known |Fix| datatype (also
+called |Mu|):
+
+\begin{spec}
+data Fix f = In { out : f (Fix f) }
+\end{spec}
+
+A type |Fix f| contains an |f|, with |Fix f| at the recursive
+positions, producting a deep embedding. For indexed functors, as we
+used in section \ref{sec:multirec} and after, a similar fixpoint
+datatype is also possible. This datatype is itself indexed, but is
+otherwise similar to |Fix| above. We will call it |HFix|, and define
+it as:
+
+\begin{code}
+data HFix (f :: (kphi -> *) -> kphi -> *) ix = HIn { hout :: f (HFix f) ix }
+\end{code}
+
+This datatype can be used to create a deep embedding using the indexed
+functors without elements. When we introduce elements, however, we
+want to have a choice at the |I| position: either we store an element
+(the left case) or we recurse. This means we want to produce a type
+which looks as follows:
+
+\begin{spec}
+type DeepF phi es ix = PF phi (Case es (PF phi (Case es ...))) ix
+\end{spec}
+
+When we have a function application |f (g x)|, we can use function
+composition to write this as |(f . g) x|. We can also do this at the
+type level, using \emph{functor composition} to flatten the nested
+type applications at the recursive positions above:
+
+\begin{code}
+data (f :.: g) (r :: * -> *) ix = Comp { unComp :: (f (g r) ix) }
+\end{code}
+
+We can now rewrite the type |DeepF| above as:
+
+\begin{spec}
+type DeepF phi es ix = (PF phi :.: Case es) ((PF phi :.: Case es) ...) ix
+\end{spec}
+
+This type can be represented in Haskell by using the |HFix| type above:
+
+\begin{spec}
+type DeepF phi es ix = HFix (PF phi :.: Case es) ix
+\end{spec}
+
+We can now convert types to the deep embedding. We can either use the
+|Fam| type class and recursively apply the |from| function, or define
+a new typeclass |FamFix|. We will do the latter here, but we do not
+give instances, which are straightforward: they are the same as
+before, with an extra |Fix| around the functors and a call to |hfrom|
+instead of the |R0| constructor.
+
+\begin{code}
+class FamFix phi es where
+  hfrom  ::  phi es a ix  -> a                             -> HFix (PF phi :.: Case es) ix
+  hto    ::  phi es a ix  -> HFix (PF phi :.: Case es) ix  -> a
+\end{code}
+
+To write functions that operate on this fixpoint representation, the
+type classes like |HFunctor| don't have to change: they make no
+assumptions about the recursive positions. Only the top-level
+function, which `ties the knot' using knowledge about the recursive
+position, has to change. As an example, we write |gmap| in this
+representation. It consists of a function |gmapFix|, which converts to
+and from the generic representation, and calls a function |gmapFixF|.
+This function does the actual work, unwrapping the |HFix| and |Comp|,
+applying the function |f| to the elements, and calling itself at the
+recursive positions, and finally wrapping in |Comp| and |HFix| again.
+
+\begin{code}
+gmapFix ::  forall phi es es' a b ix. 
+            (FamFix phi es, FamFix phi es', HFunctor (FamPrf phi es) (PF phi)) =>
+            (forall ix. es ix -> es' ix) -> phi es a ix -> phi es' b ix -> a -> b
+gmapFix f pfrom pto = hto pto . gmapFixF f (Proof pfrom) . hfrom pfrom
+
+gmapFixF ::  forall phi es es' a b ix. (HFunctor (FamPrf phi es) (PF phi)) =>
+             (forall ix. es ix -> es' ix) -> Proof (phi es) ix -> 
+             HFix (PF phi :.: Case es) ix -> HFix (PF phi :.: Case es') ix
+gmapFixF f _ = HIn . Comp . hmap (el <?> rec) . unComp . hout
+  where
+    el :: forall ix. NatPrf ix -> es ix -> es' ix
+    el = const f
+    rec ::  forall ix. Proof (phi es) ix -> 
+            HFix (PF phi :.: Case es) ix -> HFix (PF phi :.: Case es') ix
+    rec = gmapFixF f
 \end{code}
