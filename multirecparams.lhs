@@ -399,7 +399,7 @@ data Fix f = In { out : f (Fix f) }
 \end{spec}
 
 A type |Fix f| contains an |f|, with |Fix f| at the recursive
-positions, producting a deep embedding. For indexed functors, as we
+positions, producing a deep embedding. For indexed functors, as we
 used in section \ref{sec:multirec} and after, a similar fixpoint
 datatype is also possible. This datatype is itself indexed, but is
 otherwise similar to |Fix| above. We will call it |HFix|, and define
