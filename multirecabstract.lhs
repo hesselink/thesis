@@ -28,7 +28,7 @@ representation for mutually recursive datatypes used in section
 in the type we expect |gmap| to have in this representation:
 
 \begin{spec}
-gmap ::  (Fam phi es, Fam phi es', GMap (PF phi)) => 
+gmap ::  (Fam phi es, Fam phi es', GMap (PF phi)) =>
          (forall ix. es ix -> es' ix) -> phi es a -> phi es' b -> a -> b
 \end{spec}
 
@@ -47,7 +47,7 @@ This function takes two arguments: a function to transform the
 elements, which was provided at the top level, and a function to
 transform the recursive points. This function would be provided in
 |gmap|, and would itself be |gmap| again, surrounded by wrapping and
-unwrapping an |I0|. 
+unwrapping an |I0|.
 
 A problem arises at the |I| instance. For example, if we represent a
 list, a recursive position in the pattern functor has the type |I
@@ -115,7 +115,7 @@ type PFAST  =    (    K Int
                  :+:  I (Suc Zero)  :*: I Zero
                  ) :>: Zero
             :+:  (    I (Suc (Suc Zero))   :*: I Zero
-                 :+:  I (Suc Zero)  :*: I (Suc Zero) 
+                 :+:  I (Suc Zero)  :*: I (Suc Zero)
                  ) :>: (Suc Zero)
             :+:       K String :>: (Suc (Suc Zero))
 \end{code}
@@ -237,7 +237,7 @@ but not over all, which means we need scoped type variables, by
 turning on the ScopedTypeVariables extension to GHC.
 
 \begin{code}
-compos ::  forall phi a ix. (Fam phi, HFunctor (Proof phi) (PF phi)) => 
+compos ::  forall phi a ix. (Fam phi, HFunctor (Proof phi) (PF phi)) =>
            (forall a ix. phi a ix -> a -> a) -> phi a ix -> a -> a
 compos f p = to p . hmap rec . from p
   where

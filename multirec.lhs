@@ -23,7 +23,7 @@
 The functor representation used in section \ref{sec:functorrep} and
 beyond can only represent \emph{regular datatypes}. In particular, it
 cannot represent a family of mutually recursive datatypes. This is
-unfortunate, as these occur frequently in practice. 
+unfortunate, as these occur frequently in practice.
 
 The approach used in the multirec library \cite{multirec} still uses a
 functor representation, but it can represent families of mutually
@@ -93,7 +93,7 @@ type PFAST  =    (    K Int
                  :+:  I Decl  :*: I Expr
                  ) :>: Expr
             :+:  (    I Var   :*: I Expr
-                 :+:  I Decl  :*: I Decl 
+                 :+:  I Decl  :*: I Decl
                  ) :>: Decl
             :+:       K String :>: Var
 \end{code}

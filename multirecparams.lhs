@@ -124,7 +124,7 @@ type PFAST  =    (    I (Elem Zero)
                  :+:  I (Rec (Suc Zero))  :*: I (Rec Zero)
                  ) :>: Rec Zero
             :+:  (    I (Rec (Suc (Suc Zero)))  :*: I (Rec Zero)
-                 :+:  I (Rec (Suc Zero))        :*: I (Rec (Suc Zero)) 
+                 :+:  I (Rec (Suc Zero))        :*: I (Rec (Suc Zero))
                  ) :>: Rec (Suc Zero)
             :+:       K String :>: Rec (Suc (Suc Zero))
 
@@ -305,7 +305,7 @@ presence of higher-rank polymorphism. The |el| function does nothing,
 while the |rec| function is the same as before.
 
 \begin{code}
-compos ::  forall phi es a ix. (Fam phi es, HFunctor (FamPrf phi es) (PF phi)) => 
+compos ::  forall phi es a ix. (Fam phi es, HFunctor (FamPrf phi es) (PF phi)) =>
            (forall a ix. phi es a ix -> a -> a) -> phi es a ix -> a -> a
 compos f p = to p . hmap (el <?> rec) . from p
   where
@@ -465,19 +465,19 @@ applying the function |f| to the elements, and calling itself at the
 recursive positions, and finally wrapping in |Comp| and |HFix| again.
 
 \begin{code}
-gmapFix ::  forall phi es es' a b ix. 
+gmapFix ::  forall phi es es' a b ix.
             (FamFix phi es, FamFix phi es', HFunctor (FamPrf phi es) (PF phi)) =>
             (forall ix. es ix -> es' ix) -> phi es a ix -> phi es' b ix -> a -> b
 gmapFix f pfrom pto = hto pto . gmapFixF f (Proof pfrom) . hfrom pfrom
 
 gmapFixF ::  forall phi es es' a b ix. (HFunctor (FamPrf phi es) (PF phi)) =>
-             (forall ix. es ix -> es' ix) -> Proof (phi es) ix -> 
+             (forall ix. es ix -> es' ix) -> Proof (phi es) ix ->
              HFix (PF phi :.: Case es) ix -> HFix (PF phi :.: Case es') ix
 gmapFixF f _ = HIn . Comp . hmap (el <?> rec) . unComp . hout
   where
     el :: forall ix. NatPrf ix -> es ix -> es' ix
     el = const f
-    rec ::  forall ix. Proof (phi es) ix -> 
+    rec ::  forall ix. Proof (phi es) ix ->
             HFix (PF phi :.: Case es) ix -> HFix (PF phi :.: Case es') ix
     rec = gmapFixF f
 \end{code}
@@ -592,7 +592,7 @@ this using the function |eqCong|.
 \begin{code}
 class EqS prf where
   eqS :: prf ix -> prf ix' -> Maybe (ix :=: ix')
- 
+
 instance EqS (Proof (AST (E0 a))) where
   eqS (Proof Expr)  (Proof Expr)  = Just Refl
   eqS (Proof Decl)  (Proof Decl)  = Just Refl
@@ -656,7 +656,7 @@ existential values, and to constrain the type of |phi| to match
 between the top-level definition and the local definitions.
 
 \begin{code}
-gleft ::  forall phi es a ix. (Fam phi es, HZero (FamPrf phi es) (PF phi), SmallEl NatPrf es) => 
+gleft ::  forall phi es a ix. (Fam phi es, HZero (FamPrf phi es) (PF phi), SmallEl NatPrf es) =>
           phi es a ix -> a
 gleft p = to p $ hzero gcase (CR (Proof p)) True
   where

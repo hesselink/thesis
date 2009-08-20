@@ -57,7 +57,7 @@ we don't know how many type parameters the type we are representing
 takes, and we have no kind polymorphism available in Haskell, our only
 option is to refer to the fully applied type including all type
 parameters. For example, in the one element case, |r| could be |[]|,
-whereas now it would be |[a]|. 
+whereas now it would be |[a]|.
 \Todo{clear up, example}
 
 As an example of the GADT that holds the parameters, let us consider
@@ -360,7 +360,7 @@ element, polymorphic in the index, i.e. it is a producer of elements.
 The second is the value to put at the recursive position. We again do
 not ask the user to provide this, but will `tie the knot' later. The
 third is a boolean, which we will use in the case of a sum, as
-mentioned earlier. 
+mentioned earlier.
 
 \begin{spec}
 class HZero f where
@@ -480,7 +480,7 @@ The other cases are unchanged, and have no constraints on |prf|.
 \begin{code}
 class HZero prf f where
   hzero :: (forall n. prf n -> es n) -> r -> Bool -> f es r
- 
+
 instance Small a => HZero prf (K a) where
   hzero _ _ _ = K small
 
