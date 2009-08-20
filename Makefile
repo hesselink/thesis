@@ -1,6 +1,9 @@
 SRC = thesis.tex introduction.tex benchmark.tex typeparameters.tex functorrep.tex oneparam.tex multiparam.tex multirec.tex multirecabstract.tex multirecparams.tex applications.tex thesis.bib
 
-.PHONY : clean
+.PHONY : clean $(SRC:%.tex=ghci-%)
+
+ghci-% :
+	ghci -pgmL lhs2tex -optL --pre $*.lhs
 
 thesis.pdf : $(SRC)
 	latexmk -pdf -g $<
