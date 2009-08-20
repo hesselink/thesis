@@ -1,4 +1,4 @@
-SRC = thesis.tex introduction.tex benchmark.tex typeparameters.tex functorrep.tex oneparam.tex multiparam.tex multirec.tex multirecabstract.tex multirecparams.tex applications.tex
+SRC = thesis.tex introduction.tex benchmark.tex typeparameters.tex functorrep.tex oneparam.tex multiparam.tex multirec.tex multirecabstract.tex multirecparams.tex applications.tex thesis.bib
 
 .PHONY : clean
 
