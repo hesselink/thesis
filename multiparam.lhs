@@ -326,6 +326,7 @@ gmapExample2 = gmap (apply $ chr & length) example
 \end{code}
 
 \subsection{Producers - generic zero}
+\label{sec:multiparam:producers}
 
 We can divide generic functions into three separate classes:
 consumers, transformers and producers. Consumers are functions that

@@ -77,9 +77,24 @@ data Expr a  =  Const a
              |  Mul (Expr a) (Expr a)
              |  EVar Var
              |  Let (Decl a) (Expr a)
+\end{code}
+%if style == newcode
+\begin{code}
+             deriving Show
+\end{code}
+%endif
 
+\begin{code}
 data Decl a  =  Var := (Expr a)
              |  Seq (Decl a) (Decl a)
+\end{code}
+%if style == newcode
+\begin{code}
+             deriving Show
+\end{code}
+%endif
+
+\begin{code}
 
 type Var     =  String
 
@@ -107,11 +122,11 @@ type PFAST  =    (    I (Elem Zero)
                  :+:  I (Rec Zero)        :*: I (Rec Zero)
                  :+:  I (Rec (Suc (Suc Zero)))
                  :+:  I (Rec (Suc Zero))  :*: I (Rec Zero)
-                 ) :>: Zero
+                 ) :>: Rec Zero
             :+:  (    I (Rec (Suc (Suc Zero)))  :*: I (Rec Zero)
                  :+:  I (Rec (Suc Zero))        :*: I (Rec (Suc Zero)) 
-                 ) :>: (Suc Zero)
-            :+:       K String :>: (Suc (Suc Zero))
+                 ) :>: Rec (Suc Zero)
+            :+:       K String :>: Rec (Suc (Suc Zero))
 
 type family PF phi :: (knat -> *) -> knat -> *
 type instance PF AST = PFAST
@@ -143,13 +158,16 @@ recursive position to allow both elements, and recursive values. In the
 instance for |AST|, we use the case constructors |CL| for elements,
 and |CR| for recursive values.
 
+%% De types in from en to staan niet netjes onder elkaar omdat dat
+%% niet past.
+
 \begin{code}
 data R0 :: ((knat -> *) -> * -> knat -> *) -> (knat -> *) -> knat -> * where
   R0 :: phi es a ix -> a -> R0 phi es ix
 
 class Fam phi es where
-  from  ::  phi es a ix  -> a                                -> PF phi (Case es (R0 phi es)) ix
-  to    ::  phi es a ix  -> PF phi (Case es (R0 phi es)) ix  -> a
+  from  ::  phi es a ix  -> a -> PF phi (Case es (R0 phi es)) (Rec ix)
+  to    ::  phi es a ix  -> PF phi (Case es (R0 phi es)) (Rec ix) -> a
 
 rec p  x = I (CR  (R0 p x))
 el     x = I (CL  (E0 x))
@@ -272,9 +290,9 @@ Note that since the type indicates that the indices for the proof and
 the value are the same, we only need to (and indeed, only can) give
 the cases where both are either a |CL| or a |CR|.
 \begin{code}
-(<?>) :: (forall ix. pl  ix -> f  ix -> f'  ix) ->
-         (forall ix. pr  ix -> g  ix -> g'  ix) ->
-         Case pl pr ix -> Case f g ix -> Case f' g' ix
+(<?>) ::  (forall ix. pl  ix -> f  ix -> f'  ix) ->
+          (forall ix. pr  ix -> g  ix -> g'  ix) ->
+          Case pl pr ix -> Case f g ix -> Case f' g' ix
 (f <?> g) (CL p) (CL x) = CL (f p x)
 (f <?> g) (CR p) (CR y) = CR (g p y)
 \end{code}
@@ -463,3 +481,206 @@ gmapFixF f _ = HIn . Comp . hmap (el <?> rec) . unComp . hout
             HFix (PF phi :.: Case es) ix -> HFix (PF phi :.: Case es') ix
     rec = gmapFixF f
 \end{code}
+
+\subsection{Producers}
+
+As in section \ref{sec:multiparam:producers}, we will show a
+\emph{producer} function, which produces a generic value from only
+non-generic inputs. We will again implement the generic `left' and
+`right' values of a datatype.
+
+We begin with a type class for defining our function |hzero| on the
+functors. It takes an argument function which can generate the
+recursive positions, and produces a functor |f|. Both the argument
+function and |hzero| itself take a proof and a boolean argument. The
+proof restrict the index being generated, and the boolean indicates
+whether to create an |L| or an |R| constructor in the sum case.
+
+\begin{code}
+class HZero prf f where
+  hzero :: (forall ix. prf ix -> Bool -> r ix) -> prf ix -> Bool -> f r ix
+\end{code}
+
+This function shows the need to tag with |Rec n| instead of just |n|.
+If we were to tag the functors at top level with indices without a
+|Rec|, the recursive positions would still take a |Case| of two
+proofs, and so have indices |Left| and |Right|. This means we would
+need to parametrize the |HZero| type class over \emph{two} proofs, and
+instantiate the first proof to |FamPrf phi es| and the second to
+|Proof (phi es)|. By tagging with |Rec n|, we avoid this and can use a
+single proof type.
+
+The instances for |I|, |K|, |:+:| and |:*:| are similar to those in
+section \ref{sec:multiparam:producers}. In the |I| case, we apply the
+function for recursive positions, using the |El| type class to
+generate a proof. For |K|, we use the |Small| type class again to
+generate concrete values. In case of a sum, we use the boolean
+argument to choose either |L| or |R|, and for a product we generate
+both sides and combine them.
+
+\begin{code}
+instance El prf xi => HZero prf (I xi) where
+  hzero f _ left = I (f proof left)
+
+instance Small x => HZero prf (K x) where
+  hzero _ _ _ = K small
+
+instance (HZero prf f, HZero prf g) => HZero prf (f :+: g) where
+  hzero f p True   = L  (hzero f p True  )
+  hzero f p False  = R  (hzero f p False )
+
+instance (HZero prf f, HZero prf g) => HZero prf (f :*: g) where
+  hzero f p left = hzero f p left :*: hzero f p left
+\end{code}
+
+The instance for |:>:| is more interesting. Remember that this data
+type is a GADT, with on constructor, |Tag|, which constrains its first
+type argument (which we'll call |xi| here) and its index |ix| to be
+the same type.
+
+The code we wish to write is simple: we want to call |hzero|
+recursively, and wrap the result in |Tag|. However, which proof do we
+pass? If we pass the proof we get as an argument to |hzero|, we get a
+value at index |ix|, but |Tag| needs a value at index |xi|. If we
+construct a proof at index |xi| using the |proof| function, we
+generate a value at index |xi| which |Tag| accepts, but which is the
+wrong type to return, since we need to return a value at index |ix|.
+
+The solution is to check if the types |xi| and |ix| are the same, and
+if they are, show this to the type checker. Note that they do not
+\emph{have} to be the same here. When constructing a value of |:>:|,
+|xi| and |ix| are the same, but the instance of |HZero| can be called
+with different types for each (for example, by using an explicit type
+signature on the result of a call to |hzero|).
+
+Since we cannot pattern match on types, we cannot compare all types,
+but only indices of the same type constructor. As a result, we do not
+just return a |Bool|. Instead, if the types match, we produce an
+\emph{equality proof} |t1 :=: t2|. We can pattern match on this proof
+to introduce an equality constraint in the type checker between these
+two types.
+
+The equality type is defined as follows. It takes two type arguments,
+but the only constructor constrains these types to be the same.
+
+\begin{code}
+data (:=:) :: * -> * -> * where
+  Refl :: a :=: a
+
+infix 4 :=:
+\end{code}
+
+The type class for testing type equality will be called |EqS|. It
+takes two proofs at different indices, and compares the indices for
+equality. It returns either |Nothing| when the types don't match, or
+|Just Refl| when they do. Note that we can only define the function
+|eqS| if the proof is itself a GADT. If it is a regular parametrized
+type, we cannot learn anything about the type by pattern matching on
+the values, and so we are never allowed to produce an equality proof
+between the two different types.
+
+As an example, we give the |EqS| instance for |AST|, the family of
+expressions and declarations. The |AST| type is applied to the
+elements container and wrapped in a |Proof| type, as this is how it is
+used in the generic functions.
+
+We also give instances for |NatPrf| and |Case prf1 prf2|. In these
+instances, we need the congruence property of equality: if we know
+that |a :=: b|, then we also know that |f a :=: f b|. We can prove
+this using the function |eqCong|.
+
+\begin{code}
+class EqS prf where
+  eqS :: prf ix -> prf ix' -> Maybe (ix :=: ix')
+ 
+instance EqS (Proof (AST (E0 a))) where
+  eqS (Proof Expr)  (Proof Expr)  = Just Refl
+  eqS (Proof Decl)  (Proof Decl)  = Just Refl
+  eqS (Proof Var )  (Proof Var )  = Just Refl
+  eqS _     _     = Nothing
+
+eqCong :: a :=: b -> f a :=: f b
+eqCong Refl = Refl
+
+instance EqS NatPrf where
+  eqS PZ       PZ       = Just Refl
+  eqS (PS p1)  (PS p2)  = fmap eqCong (eqS p1 p2)
+  eqS _        _        = Nothing
+
+instance (EqS prf1, EqS prf2) => EqS (Case prf1 prf2) where
+  eqS (CL p1)  (CL p2)  = fmap eqCong (eqS p1 p2)
+  eqS (CR p1)  (CR p2)  = fmap eqCong (eqS p1 p2)
+  eqS _        _        = Nothing
+\end{code}
+
+We can now bring all this together to give the instance for |:>:|. We
+require an instance |El prf xi| so we can produce a proof |prf xi|. We
+get a proof |prf ix| as an argument, and we compare the two index
+types for equality. If they match, we can pattern match on |Refl|,
+introducing an equality constraint |xi ~ ix|, and we are allowed to
+return the value we want.
+
+\Todo{Moet ik nog iets zeggen over de Nothing case? Die kan volgens mij niet voorkomen met een echte |Fam| instance, maar alleen met een direct aanroep van |hzero| met een type signature.}
+
+\begin{code}
+instance (HZero prf f, El prf xi, EqS prf) => HZero prf (f :>: xi) where
+  hzero f p left = let p' = proof :: prf xi in
+    case eqS p p' of
+      Just Refl -> Tag (hzero f p' left)
+\end{code}
+
+Before we can define the top level function |gleft|, we need to be
+able to generate values of |Case f g ix|, given functions to create |f
+ix| and |g ix|, because we use |Case| at the recursive positions. The
+function is fairly straightforward: we take a |Case| of two proof
+arguments and pattern match on it. If it is a |CL|, we produce a |CL|
+with an |f| inside, and similarly for |CR| and |g|.
+
+\begin{code}
+hzeroC ::  (forall ix. prf  ix -> Bool -> f ix) ->
+           (forall ix. prf' ix -> Bool -> g ix) ->
+           Case prf prf' ix -> Bool -> Case f g ix
+hzeroC f g (CL p)  left = CL  (f  p left)
+hzeroC f g (CR p)  left = CR  (g  p left)
+\end{code}
+
+Now we can tie all this together in the top level function |gleft|,
+which generates left-biased values for any type in a family |phi|. The
+function calls |hzero| to generate a generic value, and then converts
+it to a concrete value using |to|. The function to construct the
+recursive points generates a case with |hzeroC|. The left branch
+generates elements, using the previously defined type class |SmallEl|.
+The right branch generates recursive values by calling |gleft|. As
+before, type signatures are required because of pattern matching on
+existential values, and to constrain the type of |phi| to match
+between the top-level definition and the local definitions.
+
+\begin{code}
+gleft ::  forall phi es a ix. (Fam phi es, HZero (FamPrf phi es) (PF phi), SmallEl NatPrf es) => 
+          phi es a ix -> a
+gleft p = to p $ hzero gcase (CR (Proof p)) True
+  where
+    gcase :: forall ix. FamPrf phi es ix -> Bool -> Case es (R0 phi es) ix
+    gcase = hzeroC (const . smallEl) rec
+    rec :: forall ix. Proof (phi es) ix -> Bool -> R0 phi es ix
+    rec (Proof p) left = R0 p (gleft p)
+\end{code}
+
+%if style == newcode
+\begin{code}
+class SmallEl prf es where
+  smallEl :: prf ix -> es ix
+
+class Small x where
+  small :: x
+
+instance Small () where small = ()
+instance Small Int where small = 0
+instance Small Integer where small = 0
+instance Small Char where small = '\0'
+instance Small [a] where small = []
+
+instance Small a => SmallEl NatPrf (E0 a) where
+  smallEl _ = E0 small
+\end{code}
+%endif
