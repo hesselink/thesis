@@ -620,13 +620,19 @@ types for equality. If they match, we can pattern match on |Refl|,
 introducing an equality constraint |xi ~ ix|, and we are allowed to
 return the value we want.
 
-\Todo{Moet ik nog iets zeggen over de Nothing case? Die kan volgens mij niet voorkomen met een echte |Fam| instance, maar alleen met een direct aanroep van |hzero| met een type signature.}
+We believe the case where they don't match (|Nothing|) cannot occur
+with a well-typed |Fam| instance, but only with a manual call to
+|hzero| specifying a type signature. Therefor, instead of changing the
+signature of |hzero| to deal with errors by using |Maybe| or |Either|,
+we use the |error| function.
 
 \begin{code}
 instance (HZero prf f, El prf xi, EqS prf) => HZero prf (f :>: xi) where
   hzero f p left = let p' = proof :: prf xi in
     case eqS p p' of
       Just Refl -> Tag (hzero f p' left)
+      Nothing   -> error
+        "Indices ix and xi do not match in HZero instance for :>:."
 \end{code}
 
 Before we can define the top level function |gleft|, we need to be

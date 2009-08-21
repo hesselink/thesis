@@ -52,13 +52,17 @@ infixr 6 :+:
 
 The type |a| in the type of |E| is the type level number, used to
 indicate which type parameter it is. This ensures that we don't change
-the order of the parameters. Note that |r| has kind |*| again. Since
-we don't know how many type parameters the type we are representing
-takes, and we have no kind polymorphism available in Haskell, our only
-option is to refer to the fully applied type including all type
-parameters. For example, in the one element case, |r| could be |[]|,
-whereas now it would be |[a]|.
-\Todo{clear up, example}
+the order of the parameters. For example, if we have a type with two
+type parameters, |T a b|, an |a| would be represented as |E Zero es
+r|, and a |b| as |E (Suc Zero) es r|. By requiring these indices to
+remain the same, we ensure that we don't accidentally use a |b| where
+an |a| was expected.
+
+Note that |r| has kind |*| again. Since we don't know how many type
+parameters the type we are representing takes, and we have no kind
+polymorphism available in Haskell, our only option is to refer to the
+fully applied type including all type parameters. For example, in the
+one element case, |r| could be |[]|, whereas now it would be |[a]|.
 
 As an example of the GADT that holds the parameters, let us consider
 representing a data type with two type parameters. The GADT will be as

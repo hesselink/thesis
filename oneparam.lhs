@@ -2,6 +2,7 @@
 \long\def\ignore#1{}
 %include polycode.fmt
 %include thesis.fmt
+%options ghci -fglasgow-exts
 %if style == newcode
 \begin{code}
 {-# LANGUAGE TypeFamilies
@@ -147,3 +148,8 @@ universally quantified in the class method |gmap'|.
 gmap :: (Ix r, GMap (PF r)) => (a -> b) -> r a -> r b
 gmap f = to . gmap' (gmap f) f . from
 \end{code}
+
+We can now use |gmap| on any type for which we have a generic
+representation. Since we have defined an |Ix| instance for lists
+earlier, we can now evaluate |gmap (+1) [1,2,3]| to get \eval{gmap
+(+1) [1,2,3]}.
