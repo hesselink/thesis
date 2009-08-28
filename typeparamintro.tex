@@ -1,0 +1,23 @@
+\section{Introduction}
+
+\Todo{intro on generics: why, previous work, motivation for this work}
+
+In this chapter, we will introduce an extension of the fixed point
+view on datatypes to be able to represent datatypes with type
+parameters. We will start by introducing a simple functor
+representation of datatypes using fixed points (section
+\ref{sec:functorrep}. We will then add support for a single type
+parameter by extending the functors with an extra type parameter
+(section \ref{sec:oneparam}).
+
+We will then introduce our extension, which allows us to represent
+datatypes with an arbitrary number of type parameters. We will
+introduce this extension in section \ref{sec:multiparam}. We will then
+introduce the approach to represent mutually recursive datatypes
+generically in the fixed point view \cite{multirec} as used in the
+`multirec' library (section \ref{sec:multirec}).
+
+In section \ref{sec:multirecabstract} we will show how multirec has to
+be adapted to incorporate our extension with type parameters. Finally,
+we will show how this extension can be added, and show examples of its
+use (section \ref{sec:multirecparams}.
