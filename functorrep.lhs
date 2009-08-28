@@ -10,9 +10,20 @@
 \end{code}
 %endif
 
-\Todo{Intro}
+Generic programming exists thanks to the fact that Haskell algebraic
+datatypes have a generic structure. They are composed of \emph{sums}
+(choices) of constructors, each consisting of \emph{products}
+(combinations) of types. By creating a uniform representation of
+datatypes using so-called functors to represent these sums and
+products, we can treat datatypes generically.
 
-A simple functor representation of data types uses four different data types:
+In the \emph{fixed-point} view of a datatype, we use an additional
+functor to represent the recursive points in a datatype. This allows
+us to write generic functions that exploit knowledge about these
+recursive points, like the |fold|.
+
+This simple functor representation of data types uses four different
+data types:
 
 \begin{code}
 data K a        r = K a
