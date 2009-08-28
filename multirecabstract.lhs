@@ -1,4 +1,5 @@
 \section{Abstract indices}
+\label{sec:multirecabstract}
 %include polycode.fmt
 %include forall.fmt
 %include thesis.fmt

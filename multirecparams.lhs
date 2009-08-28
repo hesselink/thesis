@@ -1,4 +1,5 @@
 \section{Multirec with type parameters}
+\label{sec:multirecparams}
 %include polycode.fmt
 %include forall.fmt
 %include thesis.fmt

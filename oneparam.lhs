@@ -1,4 +1,5 @@
 \section{Type parameters}
+\label{sec:oneparam}
 \long\def\ignore#1{}
 %include polycode.fmt
 %include thesis.fmt
