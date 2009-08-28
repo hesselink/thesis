@@ -1,2 +1,31 @@
 \chapter{Benchmarking multirec}
 \cite{benchmark}
+
+\begin{itemize}
+\item Describe what the benchmark is
+\item Describe what Alexey has already done
+\item Describe what I don't agree with and what my view is
+\item Describe what my extension has improved
+\end{itemize}
+
+For the past years, research on generic programming in Haskell has
+been a hot topic, and as a result, the number of libraries for
+generics programming in Haskell has exploded. On the one hand, this
+is a good thing: it allows us to compare and evaluate different
+approaches to generic programming. On the other hand, this makes it
+hard to choose a library for generic programming, especially since it
+is difficult to compare the different libraries.
+
+Alexey Rodriguez has developed a benchmark for generic programming
+libraries \cite{benchmark} that aims to alleviate this problem. It
+selects a range of types of problems that generic programming can
+solve, and rates a range of libraries on if they are able to solve
+these problems. Additionally, some other quality aspects like ease of
+use are also judged. Using the results of this benchmark, it is
+possible to select the right generic programming library for a certain
+application.
+
+Although the technical report does not include a benchmark for the
+multirec \cite{multirec} library, this is included in Alexey
+Rodriguez' thesis \cite{thesis_alexey}. The results of this benchmark
+are reproduced in figure \Todo{add figure and ref}.
