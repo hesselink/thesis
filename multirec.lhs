@@ -1,4 +1,4 @@
-\section{Multirec: mutually recursive datatypes}
+\section{Multirec: mutually recursive data types}
 \label{sec:multirec}
 %include polycode.fmt
 %include forall.fmt
@@ -21,13 +21,13 @@
 %endif
 
 The functor representation used in section \ref{sec:functorrep} and
-beyond can only represent \emph{regular datatypes}. In particular, it
-cannot represent a family of mutually recursive datatypes. This is
+beyond can only represent \emph{regular data types}. In particular, it
+cannot represent a family of mutually recursive data types. This is
 unfortunate, as these occur frequently in practice.
 
 The approach used in the multirec library \cite{multirec} still uses a
 functor representation, but it can represent families of mutually
-recursive datatypes.  It does this by \emph{indexing} the recursive
+recursive data types.  It does this by \emph{indexing} the recursive
 points with a type that indicates to which type in the family the
 recursion goes.
 
@@ -51,7 +51,7 @@ differs from the functor index |ix|, which indicates which type we are
 currently describing.
 
 We have used kinds |kphi| instead of |*| to indicate that only a restricted
-subset of types is allowed. Only types from the family of datatypes we are
+subset of types is allowed. Only types from the family of data types we are
 describing are used to index the functors.
 
 So far, the index |ix| of the functor components is completely free:
@@ -65,7 +65,7 @@ data (f :>: (xi :: kphi))  (r :: kphi -> *) (ix :: kphi) where
   Tag :: f r ix -> (f :>: ix) r ix
 \end{code}
 
-As an example, let us consider a datatype of expressions, also used in
+As an example, let us consider a data type of expressions, also used in
 \cite{multirec}:
 
 \begin{code}
@@ -81,7 +81,7 @@ data Decl  =  Var := Expr
 type Var   =  String
 \end{code}
 
-These datatypes are mutually recursive: |Expr| can contain a |Decl|,
+These data types are mutually recursive: |Expr| can contain a |Decl|,
 and |Decl| can contain an |Expr|. Both contain |Var|s. To represent
 this data type, we can use the following pattern functor:
 

@@ -14,8 +14,8 @@
 %endif
 
 Using the functor representation to represent types with type
-parameters, like |[a]|, is problematic. For example, let's say we want
-to represent the list datatype, which might be defined as:
+parameters, like |[a]|, is problematic. For example, suppose we want
+to represent the list data type, which might be defined as:
 
 \begin{spec}
 data [a] = [] | a : [a]
@@ -154,3 +154,20 @@ We can now use |gmap| on any type for which we have a generic
 representation. Since we have defined an |Ix| instance for lists
 earlier, we can now evaluate |gmap (+1) [1,2,3]| to get \eval{gmap
 (+1) [1,2,3]}.
+
+We have extended the functor representation from Section
+\ref{sec:functorrep} to be able to represent data types with one type
+parameter. However, to represent types with no type parameters, we
+have to wrap them, since we can only represent data types of kind |*
+-> *|. We also cannot represent data types with more than one type
+parameter, like the |Either| type, except by representing the first
+type parameter using the |K| constructor. If we do this we once again
+use the ability to use this element value in generic functions.
+
+The approach of using functors of kind |* -> *| to represent data types with
+one type parameter has been used before, for example in PolyP \cite{polyp}.
+Other generic programming approaches, for example EMGM \cite{emgm}, also use
+representations of different arities to represent data types with different
+numbers of type parameters. While this approach does work, it means that
+separate generic machinery has to be implemented for each number of type
+parameters.

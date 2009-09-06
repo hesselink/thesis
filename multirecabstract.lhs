@@ -21,10 +21,10 @@
 \end{code}
 %endif
 
-In section \ref{sec:multiparam} we used an indexed datatype to
+In section \ref{sec:multiparam} we used an indexed data type to
 represent an arbitrary number of type parameters in the generic view
-on a single datatype.  We would like to apply this method to the
-representation for mutually recursive datatypes used in section
+on a single data type.  We would like to apply this method to the
+representation for mutually recursive data types used in section
 \ref{sec:multirec}. However, there is a problem. This problem shows up
 in the type we expect |gmap| to have in this representation:
 
@@ -122,7 +122,7 @@ type PFAST  =    (    K Int
 \end{code}
 
 We now change the GADT we used to prove membership of the family of
-datatypes to also hold the relation between the concrete and the
+data types to also hold the relation between the concrete and the
 abstract types. This changes its kind, and thus also the kind of |PF|,
 which remains otherwise unchanged. Note that of the type arguments of |AST|,
 the first is a member of the family (indicated with |kphi|) and the second is a

@@ -22,7 +22,7 @@
 %endif
 
 We could add elements to the representation of mutually recursive
-datatypes along the same lines as we did in section
+data types along the same lines as we did in section
 \ref{sec:multiparam}. However, this means adding an extra type
 parameter to the functors. We can prevent this by exploiting the
 similarity between the indexed recursive position, and the indexed
@@ -386,13 +386,13 @@ roundExpr = gmap (E0 . round . unE0) Expr Expr
 \subsection{Deep embedding}
 
 So far, we have used a shallow embedding: at the recursive positions,
-we store the original datatype, instead of its generic representation.
+we store the original data type, instead of its generic representation.
 For some applications, it can be more convenient to work with a deep
-embedding, where the entire datatype is converted to a generic
+embedding, where the entire data type is converted to a generic
 representation.
 
 When we have functors of kind |* -> *| as in section
-\ref{sec:functorrep}, we use the well-known |Fix| datatype (also
+\ref{sec:functorrep}, we use the well-known |Fix| data type (also
 called |Mu|):
 
 \begin{spec}
@@ -402,7 +402,7 @@ data Fix f = In { out : f (Fix f) }
 A type |Fix f| contains an |f|, with |Fix f| at the recursive
 positions, producing a deep embedding. For indexed functors, as we
 used in section \ref{sec:multirec} and after, a similar fixpoint
-datatype is also possible. This datatype is itself indexed, but is
+data type is also possible. This data type is itself indexed, but is
 otherwise similar to |Fix| above. We will call it |HFix|, and define
 it as:
 
@@ -410,7 +410,7 @@ it as:
 data HFix (f :: (kphi -> *) -> kphi -> *) ix = HIn { hout :: f (HFix f) ix }
 \end{code}
 
-This datatype can be used to create a deep embedding using the indexed
+This data type can be used to create a deep embedding using the indexed
 functors without elements. When we introduce elements, however, we
 want to have a choice at the |I| position: either we store an element
 (the left case) or we recurse. This means we want to produce a type
@@ -488,7 +488,7 @@ gmapFixF f _ = HIn . Comp . hmap (el <?> rec) . unComp . hout
 As in section \ref{sec:multiparam:producers}, we will show a
 \emph{producer} function, which produces a generic value from only
 non-generic inputs. We will again implement the generic `left' and
-`right' values of a datatype.
+`right' values of a data type.
 
 We begin with a type class for defining our function |hzero| on the
 functors. It takes an argument function which can generate the

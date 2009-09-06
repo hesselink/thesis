@@ -3,7 +3,7 @@
 %include polycode.fmt
 %include forall.fmt
 %include thesis.fmt
-%options ghci -fglasgow-exts
+%options ghci -fglasgow-exts -pgmL lhs2tex -optL --pre
 %if style == newcode
 \begin{code}
 {-# LANGUAGE TypeFamilies
@@ -23,9 +23,9 @@ import Data.Char(chr)
 We want to abstract over the number of type parameters a type former
 takes. This means also abstracting over the kind of the recursive
 positions, since these have to take an arbitrary number of type
-parameters. The idea is, to use numbers on the type level to indicate
-the number of type parameters, and to indicate which type parameter an
-element corresponds to.
+parameters. To do this, we will use numbers on the type level to
+indicate the number of type parameters, and to indicate which type
+parameter an element corresponds to.
 
 In a dependently typed programming language, we can apply this idea
 directly. \Todo{How do I insert Agda code in here?}
@@ -112,7 +112,7 @@ data Nil a = Nil { magic :: forall a. a }
 \end{code}
 
 Although it may not look like it, this is supposed to be an empty
-datatype: no values of it can be constructed that are not |undefined| or
+data type: no values of it can be constructed that are not |undefined| or
 |Nil undefined|. Furthermore, if we somehow get a value of type |Nil
 a| (for example, while defining a type class instance), we can write
 the function using |magic|, instead of having to provide |undefined|
@@ -150,7 +150,7 @@ toTree (R (I l :*: E (S (Z b)) :*: I r))  = Branch l b r
 
 \subsection{Generic map}
 
-For the representation of a datatype with an arbitrary number of type
+For the representation of a data type with an arbitrary number of type
 parameters, we also want to define a generic map function.  We start
 by defining a type class again for data types that have a functor
 representation, and making |Tree| an instance. We define an associated
@@ -344,16 +344,17 @@ Examples are parsers, like the well-known |read| function, as well as
 test data generation.
 
 Writing one of each of these classes of functions is a good way to
-test the quality of a generic programming framework: it should be able
-to write all of these functions. So far, we have only written a
-transformer. We will now write a generic producer; producers can often
-highlight shortcomings of the implementation, since they do something
-interesting: they produce values `out of nowhere'.
+test the quality of a generic programming framework: it should be
+possible to express all of these functions in a framework. So far, we
+have only written a transformer. We will now write a generic producer;
+producers can often highlight shortcomings of the implementation,
+since they do something interesting: they produce values `out of
+nowhere'.
 
 We will implement the `generic zero': a function that produces the
-smallest value of a datatype. For example, for lists, it would produce
+smallest value of a data type. For example, for lists, it would produce
 the empty list, and for |Maybe|, it would produce |Nothing|. Some
-datatypes have no obvious smallest value; for example, |Bool|. In
+data types have no obvious smallest value; for example, |Bool|. In
 these cases, we make a choice to always either take the left or the
 right constructor. This choice will be configurable with a boolean
 parameter.
@@ -419,8 +420,8 @@ This function will provide values for all the arguments to |hzero|.
 For the boolean, will choose |True| to take a left constructor at
 sums, since it is convention to have the smallest constructor on the
 left. For recursive positions, we can just call |gleft| again.
-However, we have no way to generate element, so we will leave it up to
-the caller to provide these.
+However, we have no way to generate elements, so we will leave it up
+to the caller to provide these.
 
 \begin{spec}
 gleft :: (Ix a, HZero (PF a)) => (forall n. Es a n) -> a
@@ -459,7 +460,7 @@ matching on this type, we can also recover the actual value. This is
 another thing we need when generating values of |(:||:)|, because we
 need to decide whether to generate a |Z| or an |S| constructor.
 
-We also need to get a value of this proof at some point. Rather than
+We will need to get a value of this proof at some point. Rather than
 having the user produce it, we can generate it using a type class. The
 type class |El| contains a proof that the index |ix| can be produced
 in |prf|. We also give two instances for the natural number types.
@@ -532,9 +533,9 @@ so we resort to calling |error|. It is not possible for this to be
 called in normal use of the generic functions; however, it can be
 called manually, for example: |smallEl PZ :: Nil Zero|.
 
-Using this type class for generating elements, we can now define an
-improved version of |gleft|. It calls |smallEl| to generate elements
-and calls itself recursively to generate recursive values.
+Using the type class |SmallEl| for generating elements, we can now
+define an improved version of |gleft|. It calls |smallEl| to generate
+elements and calls itself recursively to generate recursive values.
 
 \begin{code}
 gleft :: forall a. (Ix a, HZero NatPrf (PF a), SmallEl (Es a)) => a
@@ -544,6 +545,7 @@ gleft = to $ hzero smallEl gleft True
 If we define suitable |Small| instances, we can now call, for example,
 |gleft :: Tree Int Bool| to produce \eval{gleft :: Tree Int Bool}.
 
+%if style == newcode
 \begin{code}
 instance Small Int where
   small = 0
@@ -551,4 +553,33 @@ instance Small Int where
 instance Small Bool where
   small = False
 \end{code}
+%endif
 
+We have introduced a method to generically represent elements of data
+types with an arbitrary number of type parameters. We do this by
+defining a container type to hold the elements. All functors are
+parametrized by this container type. We index the container using type
+level numbers to indicate the parameter position. This allows for type
+safe conversion from and to the original data type.
+
+Using this extension, we can define the generic mapping function
+|gmap|. We have given a type class |Apply| which allows easily mapping
+combinations of functions over our container type |(:||:)|. We have
+also shown how to define a producer function using this
+representation. This requires a \emph{proof} that the element index is
+a natural number. We give a data type for such proofs, and a type
+class to produce instances of such proofs.
+
+The provided extension has none of the problems the previous two
+representations (Sections \ref{sec:functorrep} and \ref{sec:oneparam}) had in
+representing parametrized data types. In particular, we can now represent
+regular data types with an arbitrary number of type parameters, and we have
+access to these type parameters in our generic functions. The cost is added
+complexity: we use a GADT to contain the elements of our data type, and in
+generic producer functions, we additionally need proof terms.
+
+The notion of using indexed functors to gain more expressivity has been
+mentioned elsewhere \cite{indexedcontainers}. Similar ideas are also used in
+multirec (Section \ref{multirec}) and unpublished work by Conor McBride.
+Techniques like this are also often used in dependently types languages like
+Agda \cite{agdasummerschool}.

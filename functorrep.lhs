@@ -10,20 +10,22 @@
 \end{code}
 %endif
 
-Generic programming exists thanks to the fact that Haskell algebraic
-datatypes have a generic structure. They are composed of \emph{sums}
-(choices) of constructors, each consisting of \emph{products}
-(combinations) of types. By creating a uniform representation of
-datatypes using so-called functors to represent these sums and
-products, we can treat datatypes generically.
+\Todo{references: fix-point view, regular, dat andere TF paper}
 
-In the \emph{fixed-point} view of a datatype, we use an additional
-functor to represent the recursive points in a datatype. This allows
+Generic programming exists thanks to the fact that Haskell algebraic
+data types have a generic structure. A Haskell data type composed of
+\emph{sums} (choices) of constructors, each consisting of
+\emph{products} (combinations) of types. By creating a uniform
+representation of data types using so-called functors for representing
+such sums and products, we can treat data types generically.
+
+In the \emph{fixed-point} view of a data type, we use an additional
+functor to represent the recursive points in a data type. This allows
 us to write generic functions that exploit knowledge about these
 recursive points, like the |fold|.
 
-This simple functor representation of data types uses four different
-data types:
+Let us consider this simple functor representation of data types,
+which uses four different data types:
 
 \begin{code}
 data K a        r = K a
@@ -69,3 +71,9 @@ toNat (L (K ()))  = Zero
 toNat (R (I n))   = Suc n
 \end{code}
 
+While this is a simple representation, it is powerful enough to
+represent regular Haskell data types without type parameters. Regular
+types with parameters can also be represented by treating the elements
+as constants (using the |K| functor). However, this means that it is
+not possible to write generic functions that operate on the elements
+of a data type, like |gmap| or |gzip|.
