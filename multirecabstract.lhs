@@ -24,7 +24,7 @@
 In section \ref{sec:multiparam} we used an indexed data type to
 represent an arbitrary number of type parameters in the generic view
 on a single data type.  We would like to apply this method to the
-representation for mutually recursive data types used in section
+representation for mutually recursive data types used in Section
 \ref{sec:multirec}. However, there is a problem. This problem shows up
 in the type we expect |gmap| to have in this representation:
 
@@ -65,11 +65,11 @@ the original type, but should instead use abstract types to indicate
 which type in the family they represent. The proof can then serve as a
 relation between this abstract type, and a concrete type. For
 example, it can map the type |Zero| to |Expr|, and |Suc Zero| to
-|Decl|. An |I Zero| would then store an |Expr|, and a |f :>: (Suc
+|Decl|. An |I Zero| would then store an |Expr|, and an |f :>: (Suc
 Zero)| would mark a part of the pattern functor as representing a
 |Decl|.
 
-Converting the code from section \ref{sec:multirec} step by step, the
+We convert the code from Section \ref{sec:multirec} step by step. The
 functor types don't need to change, and we use the same running
 example of expressions with declarations and variables.
 % This code is the same as in the previous section, so it is not shown
@@ -139,16 +139,16 @@ type family PF phi :: (knat -> *) -> knat -> *
 type instance PF AST = PFAST
 \end{code}
 
-To store the values at the recursive position, we used a simple
+To store the values at the recursive position, multirec uses a simple
 wrapper type |I0| that stored a value of index |ix| as-is. However, we
 cannot do so anymore, as the index is now a natural number, which is
 an empty type, and the concrete type is not visible in the pattern
 functor. We solve this by existentially quantifying over the concrete
-type, and storing the value together with a relation between the
-concrete type and the abstract index. This means that after
-unwrapping, we can use this relation (or proof) to convert the value
-to a generic representation, and we can also pattern match on it to
-recover the type information.
+type, and storing the concrete recursive value together with a
+relation between the concrete type and the abstract index. This means
+that after unwrapping, we can use this relation (or proof) to convert
+the value to a generic representation, and we can also pattern match
+on it to recover the type information.
 
 In the |Fam| type class, we change the pattern functor type to
 indicate that we use this existential wrapper type at the recursive
@@ -228,7 +228,7 @@ instance HFunctor phi f => HFunctor phi (f :>: xi) where
 %endif
 
 With these changes, we can use the |HFunctor| class and the |hmap|
-function exactly as defined in section \ref{sec:multirec}. Functions
+function exactly as defined in Section \ref{sec:multirec}. Functions
 calling |hmap| have to be changed, however, because the recursive
 positions are now wrapped in an |R0| instead of an |I0|. Since this
 type is existentially quantified, we cannot write an unwrapping
@@ -258,3 +258,16 @@ renameVar = renameVar' Expr
     renameVar' Var  s  = s ++ "_"
     renameVar' p    x  = compos renameVar' p x
 \end{code}
+
+We have changed the functors used in our generic representation to
+expose only abstract indices, and not concrete types. By doing this,
+we have made sure that the type of the pattern functor doesn't change
+when we change the type of the parameters of the original type. This
+change involved changing the proof of family membership to a relation
+between a concrete type and an abstract index. The indexing on the
+functors now uses the abstract indices. At the recursive positions, we
+still store the concrete type. This type is existentially quantified,
+so it is not visible on the outside. To recover this type later, it is
+paired with a relation to its abstract index. With this change in
+place, we can now add support for type parameters to multirec, using
+the technique from Section \ref{sec:multiparam}.

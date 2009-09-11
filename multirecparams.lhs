@@ -22,7 +22,7 @@
 %endif
 
 We could add elements to the representation of mutually recursive
-data types along the same lines as we did in section
+data types along the same lines as we did in Section
 \ref{sec:multiparam}. However, this means adding an extra type
 parameter to the functors. We can prevent this by exploiting the
 similarity between the indexed recursive position, and the indexed
@@ -106,8 +106,8 @@ data Suc a
 We will use the |Case| type to store both the elements and the
 recursive values in the |I| functor. This means that we will have |I|
 values indexed with |Left ix| for element |ix|, and with |Right ix|
-for recursion to type |ix|. To make this clearer, we introduce two
-type synonyms |Elem| and |Rec| for |Left| and |Right|. We then adapt
+for recursion on type |ix|. To make this clearer, we introduce two
+type synonyms |Elem| for |Left| and |Rec| for |Right|. We then adapt
 the type of the pattern functor. Notice how in the first alternative
 for |Expr|, we now have an |I (Elem Zero)| instead of a |K Int|,
 indicating that the constants in our expression language are now
@@ -134,15 +134,17 @@ type instance PF AST = PFAST
 \end{code}
 
 We need an indexed type to hold elements. However, since we only have
-one element type, we will use a simple wrapper type |E0| which ignores
-the index, instead of the more flexible but also more complex type
-from section \ref{sec:multiparam}.
+one element type in this example, we will use a simple wrapper type
+|E0| which ignores the index, instead of the more flexible but also
+more complex type from Section \ref{sec:multiparam}. If it was needed,
+we could use the more complex type instead.
 
 We parametrize the family index |AST| by the element collection. By
 partially applying this type later, we can fix the element type,
 making sure we don't combine an |Expr a| with a |Decl b|. When
 representing families with multiple type parameters, this also allows
-us to indicate with type is used in which position of which type.
+us to indicate which parameter position is corresponds to which
+element type in each family type.
 
 \begin{code}
 data E0 a ix = E0 { unE0 :: a }
@@ -222,14 +224,14 @@ instance El NatPrf a => El NatPrf (Suc a) where
 \end{code}
 %endif
 
-We make no change to the |El| type class (which indicated that an
+We make no change to the |El| type class (which indicates that an
 index is a member of a type) or the |Proof| wrapper. In the |El|
-instances for |AST|, we partially apply it to |E0 a| so that it has
+instances for |AST|, we partially apply |AST| to |E0 a| so that it has
 the right kind.
 
 Since our recursive positions now hold a choice of two indexed types,
 we also need to pass along a choice of two proofs: for elements, we
-use the natural number proof |NatPrf| as shown in section
+use the natural number proof |NatPrf| as shown in Section
 \ref{sec:multiparam}, and for the recursive positions, we use the family
 proof. To combine these two proofs, we can use the |Case| type, just
 as we do for the values themselves.
@@ -339,12 +341,12 @@ instance for the pattern functor of the family, using a proof that the
 elements indices are natural numbers, and the recursive values are
 members of the family.
 
-The top level function takes two family proofs, one to convert the |a|
-to a generic representation, and one to convert the result back to a
-|b|. In the call to |hmap|, we again map two functions over the
-|Case|. For the elements, we just apply the function that transforms
-the elements. At the recursive positions, we unwrap both the proof and
-the value, and apply |gmap| recursively.
+The top level function takes two family proofs, one to convert the
+input value |a| to a generic representation, and one to convert the
+result back to a |b|. In the call to |hmap|, we again map two
+functions over the |Case|. For the elements, we just apply the
+function that transforms the elements. At the recursive positions, we
+unwrap both the proof and the value, and apply |gmap| recursively.
 
 Notice that we use |es'| in the proof at the |HFunctor| constraint.
 This provides us with a proof of |phi es' b ix| instead of |phi es a
@@ -362,10 +364,10 @@ gmap f pfrom pto = to pto . hmap (el <?> rec) . from pfrom
     rec (Proof pto) (R0 pfrom x) = R0 pto (gmap f pfrom pto x)
 \end{code}
 
-We can now write the addOne function using |gmap|. To transform the
-elements, we unwrap the |E0|, add one, and wrap again. We pass in Expr
-twice, once to indicate the input type, and once to indicate the
-output type.
+We can now write the |addOne| function using |gmap|. To transform the
+elements, we unwrap the |E0|, add one, and wrap again. We pass in
+|Expr| twice, once to indicate the input type, and once to indicate
+the output type.
 
 \begin{code}
 addOne2 :: Num a => Expr a -> Expr a
@@ -391,7 +393,15 @@ For some applications, it can be more convenient to work with a deep
 embedding, where the entire data type is converted to a generic
 representation.
 
-When we have functors of kind |* -> *| as in section
+For example, when defining a \emph{type indexed data type}, you extend
+a data type in a generic way. This can be used to add metavariables to
+a data type to use during term rewriting, to annotate a data type with
+position information during parsing, etc. When you extend the generic
+representation of a type in this way, you want the recursive positions
+to contain the extended type, not the original type. You can achieve
+this by using a deep embedding.
+
+When we have functors of kind |* -> *| as in Section
 \ref{sec:functorrep}, we use the well-known |Fix| data type (also
 called |Mu|):
 
@@ -401,7 +411,7 @@ data Fix f = In { out : f (Fix f) }
 
 A type |Fix f| contains an |f|, with |Fix f| at the recursive
 positions, producing a deep embedding. For indexed functors, as we
-used in section \ref{sec:multirec} and after, a similar fixpoint
+used in Section \ref{sec:multirec} and after, a similar fixpoint
 data type is also possible. This data type is itself indexed, but is
 otherwise similar to |Fix| above. We will call it |HFix|, and define
 it as:
@@ -485,16 +495,16 @@ gmapFixF f _ = HIn . Comp . hmap (el <?> rec) . unComp . hout
 
 \subsection{Producers}
 
-As in section \ref{sec:multiparam:producers}, we will show a
-\emph{producer} function, which produces a generic value from only
-non-generic inputs. We will again implement the generic `left' and
-`right' values of a data type.
+As in Section \ref{sec:multiparam:producers}, we will show a
+\emph{producer} function (in the shallow embedding), which produces a
+generic value from only non-generic inputs. We will again implement
+the generic `left' and `right' values of a data type.
 
 We begin with a type class for defining our function |hzero| on the
 functors. It takes an argument function which can generate the
-recursive positions, and produces a functor |f|. Both the argument
+recursive positions, and produces a functor~|f|. Both the argument
 function and |hzero| itself take a proof and a boolean argument. The
-proof restrict the index being generated, and the boolean indicates
+proof restricts the index being generated, and the boolean indicates
 whether to create an |L| or an |R| constructor in the sum case.
 
 \begin{code}
@@ -512,7 +522,7 @@ instantiate the first proof to |FamPrf phi es| and the second to
 single proof type.
 
 The instances for |I|, |K|, |:+:| and |:*:| are similar to those in
-section \ref{sec:multiparam:producers}. In the |I| case, we apply the
+Section \ref{sec:multiparam:producers}. In the |I| case, we apply the
 function for recursive positions, using the |El| type class to
 generate a proof. For |K|, we use the |Small| type class again to
 generate concrete values. In case of a sum, we use the boolean
@@ -536,7 +546,7 @@ instance (HZero prf f, HZero prf g) => HZero prf (f :*: g) where
 
 The instance for |:>:| is more interesting. Remember that this data
 type is a GADT, with on constructor, |Tag|, which constrains its first
-type argument (which we'll call |xi| here) and its index |ix| to be
+type argument (which we will call |xi| here) and its index |ix| to be
 the same type.
 
 The code we wish to write is simple: we want to call |hzero|
@@ -557,9 +567,9 @@ signature on the result of a call to |hzero|).
 Since we cannot pattern match on types, we cannot compare all types,
 but only indices of the same type constructor. As a result, we do not
 just return a |Bool|. Instead, if the types match, we produce an
-\emph{equality proof} |t1 :=: t2|. We can pattern match on this proof
-to introduce an equality constraint in the type checker between these
-two types.
+\emph{equality proof} |t1 :=: t2| \cite{dynamictyping}. We can pattern
+match on this proof to introduce an equality constraint in the type
+checker between these two types.
 
 The equality type is defined as follows. It takes two type arguments,
 but the only constructor constrains these types to be the same.
@@ -621,9 +631,9 @@ types for equality. If they match, we can pattern match on |Refl|,
 introducing an equality constraint |xi ~ ix|, and we are allowed to
 return the value we want.
 
-We believe the case where they don't match (|Nothing|) cannot occur
-with a well-typed |Fam| instance, but only with a manual call to
-|hzero| specifying a type signature. Therefor, instead of changing the
+The case where the indices don't match (|Nothing|) cannot occur with a
+well-typed |Fam| instance, but only with a manual call to |hzero|
+specifying a type signature. Therefor, instead of changing the
 signature of |hzero| to deal with errors by using |Maybe| or |Either|,
 we use the |error| function.
 

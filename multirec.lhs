@@ -173,7 +173,7 @@ instance Fam AST where
   to    Var   (R (R (Tag (K s))))                                = s
 \end{code}
 
-We can define a higher order map function on the functors used here.
+We can define a higher-order map function on the functors used here.
 This function transforms the indexed recursive positions. It is
 similar to the normal |fmap| on functors, but lifted to indexed
 functors.
@@ -256,3 +256,17 @@ generic representation.
 compos :: (Fam phi, HFunctor phi (PF phi)) => (forall ix. phi ix -> ix -> ix) -> phi ix -> ix -> ix
 compos f p = to p . hmap (\p -> I0 . f p . unI0) . from p
 \end{code}
+
+The multirec paper \cite{multirec} and the corresponding library
+contain further examples, including a |fold| function with convenient
+algebras. The library also supports template Haskell generation of the
+pattern functor and the |from| and |to| functions.
+
+Using the multirec approach, we can generically represent families of
+mutually recursive data types, and access the recursive points in a
+type safe way using indexed data types. However, the approach suffers
+from the same limitations as the simple functor representation of
+Section \ref{sec:functorrep}: it is unable to represent parametrized
+data types in a way that allows us to generically access the elements.
+In the next sections, we will adapt multirec with our extension from
+Section \ref{sec:multiparam} to lift this limitation.

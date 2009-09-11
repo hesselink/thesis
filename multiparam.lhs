@@ -580,6 +580,6 @@ generic producer functions, we additionally need proof terms.
 
 The notion of using indexed functors to gain more expressivity has been
 mentioned elsewhere \cite{indexedcontainers}. Similar ideas are also used in
-multirec (Section \ref{multirec}) and unpublished work by Conor McBride.
+multirec (Section \ref{sec:multirec}) and unpublished work by Conor McBride.
 Techniques like this are also often used in dependently types languages like
 Agda \cite{agdasummerschool}.
