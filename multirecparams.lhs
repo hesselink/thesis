@@ -398,8 +398,8 @@ a data type in a generic way. This can be used to add metavariables to
 a data type to use during term rewriting, to annotate a data type with
 position information during parsing, etc. When you extend the generic
 representation of a type in this way, you want the recursive positions
-to contain the extended type, not the original type. You can achieve
-this by using a deep embedding.
+to contain the extended type, not the original type. The deep
+embedding is therefor a natural fit for this kind of application.
 
 When we have functors of kind |* -> *| as in Section
 \ref{sec:functorrep}, we use the well-known |Fix| data type (also
@@ -492,6 +492,29 @@ gmapFixF f _ = HIn . Comp . hmap (el <?> rec) . unComp . hout
             HFix (PF phi :.: Case es) ix -> HFix (PF phi :.: Case es') ix
     rec = gmapFixF f
 \end{code}
+
+We have shown how to use a generic representation that uses a deep
+embedding, where the recursive positions of a data type are also
+converted to the generic representation. This involved using a
+combination of the indexed fixpoint data type |HFix|, and indexed
+functor composition |(:.:)|
+
+To use this embedding, none of the type classes defining our generic
+functions have to change. Only the top level function, which `ties the
+knot', has to be adapted. The deep embedding is slightly more
+complicated because it needs two functions here, one converting to and
+from the generic representation, and the other working only on this
+generic representation. On the other hand, it avoids using
+existentials, and needs proof terms only to fix the types of the
+family and the elements, and not for conversion. 
+
+Performance measurements on generic rewriting \cite{genericrewriting}
+show that the deep embedding is slower than the shallow embedding, due
+to unneeded conversions to and from the generic representation.
+However, optimization techniques like fusion (using GHC's rewrite
+rules) might improve this situation. In the end, the choice between
+shallow and deep embedding depends on which representation is more
+natural for each application.
 
 \subsection{Producers}
 
