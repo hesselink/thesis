@@ -1,4 +1,7 @@
 \chapter{Benchmarking multirec}
+%include polycode.fmt
+%include forall.fmt
+%include thesis.fmt
 
 For the past years, research on generic programming in Haskell has
 been a hot topic, and as a result, the number of libraries for
@@ -24,18 +27,16 @@ are reproduced in figure \Todo{add figure and ref}.
 
 \Todo{check if universe size is increased}
 
-\Todo{change the font of function names}
-
-The original multirec library could only represent types of kind * in
-a way that gave access to the elements of a data type generically.
+The original multirec library could only represent types of kind |*|
+in a way that gave access to the elements of a data type generically.
 This meant that it was impossible to define the functions gmap and
 crushRight. In the benchmark, multirec was rated `bad' when evaluating
 it on abstraction over type constructors.
 
 With the extensions defined in this thesis, we believe this rating can
-now be changed to `good'. Defining gmap and crushRight is no different
-from defining other generic functions in multirec, and they can be
-used to define mapBinTree and flattenWTree as required.
+now be changed to `good'. Defining |gmap| and |crushRight| is no
+different from defining other generic functions in multirec, and they
+can be used to define |mapBinTree| and |flattenWTree| as required.
 
 The benchmark also judges libraries on ease of use. The multirec
 library did not score very well on this because of the large number of
@@ -46,14 +47,14 @@ function 'tying the knot', making this slightly more complex.
 
 The complexity for the actual representation of the elements varies.
 If elements are not present, the extra complexity is minimal. One
-element data types can use the E0 container, which is a regular ADT.
+element data types can use the |E0| container, which is a regular ADT.
 For representations of (families of) data types with multiple
 elements, complexity is higher, as this requires the use of the
-indexed element container type (:|:). Additionally, an additional type
-class is needed to mirror an existing type class for indexed elements.
-For example, when defining the |gleft| function (\ref{sec:producers}),
-we need both a Small type class to generate normal values, and a
-SmallEl type class to generate indexed values.
+indexed element container type |(:||:)|. Additionally, an additional
+type class is needed to mirror an existing type class for indexed
+elements.  For example, when defining the |gleft| function
+(Section \ref{sec:producers}), we need both a |Small| type class to generate
+normal values, and a |SmallEl| type class to generate indexed values.
 
 Since the ease of use of the multirec library was already low, and the
 added complexity of our extension scales with the number of type
