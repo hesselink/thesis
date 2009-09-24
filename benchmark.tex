@@ -1,12 +1,4 @@
 \chapter{Benchmarking multirec}
-\cite{benchmark}
-
-\begin{itemize}
-\item Describe what the benchmark is
-\item Describe what Alexey has already done
-\item Describe what I don't agree with and what my view is
-\item Describe what my extension has improved
-\end{itemize}
 
 For the past years, research on generic programming in Haskell has
 been a hot topic, and as a result, the number of libraries for
@@ -29,3 +21,43 @@ Although the technical report does not include a benchmark for the
 multirec \cite{multirec} library, this is included in Alexey
 Rodriguez' thesis \cite{thesis_alexey}. The results of this benchmark
 are reproduced in figure \Todo{add figure and ref}.
+
+\Todo{check if universe size is increased}
+
+\Todo{change the font of function names}
+
+The original multirec library could only represent types of kind * in
+a way that gave access to the elements of a data type generically.
+This meant that it was impossible to define the functions gmap and
+crushRight. In the benchmark, multirec was rated `bad' when evaluating
+it on abstraction over type constructors.
+
+With the extensions defined in this thesis, we believe this rating can
+now be changed to `good'. Defining gmap and crushRight is no different
+from defining other generic functions in multirec, and they can be
+used to define mapBinTree and flattenWTree as required.
+
+The benchmark also judges libraries on ease of use. The multirec
+library did not score very well on this because of the large number of
+compiler extensions used. The additions in this thesis do not require
+any additional extensions to be used. However, writing a generic
+function now requires the use of scoped type variables for the
+function 'tying the knot', making this slightly more complex.
+
+The complexity for the actual representation of the elements varies.
+If elements are not present, the extra complexity is minimal. One
+element data types can use the E0 container, which is a regular ADT.
+For representations of (families of) data types with multiple
+elements, complexity is higher, as this requires the use of the
+indexed element container type (:|:). Additionally, an additional type
+class is needed to mirror an existing type class for indexed elements.
+For example, when defining the |gleft| function (\ref{sec:producers}),
+we need both a Small type class to generate normal values, and a
+SmallEl type class to generate indexed values.
+
+Since the ease of use of the multirec library was already low, and the
+added complexity of our extension scales with the number of type
+parameters you need to support, we feel we have not increased the
+complexity of the library substantially.
+
+\Todo{automatic generation of instances?}

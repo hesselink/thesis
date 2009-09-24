@@ -517,6 +517,7 @@ shallow and deep embedding depends on which representation is more
 natural for each application.
 
 \subsection{Producers}
+\label{sec:producers}
 
 As in Section \ref{sec:multiparam:producers}, we will show a
 \emph{producer} function (in the shallow embedding), which produces a
