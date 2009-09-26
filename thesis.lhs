@@ -27,7 +27,6 @@
 \input{introduction}
 \input{benchmark}
 \input{typeparameters}
-\input{applications}
 \bibliographystyle{plain}
 \bibliography{thesis}
 
