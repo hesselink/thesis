@@ -1,4 +1,5 @@
 \chapter{Benchmarking multirec}
+\label{cha:benchmark}
 %include polycode.fmt
 %include forall.fmt
 %include thesis.fmt
