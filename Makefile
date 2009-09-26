@@ -1,4 +1,4 @@
-SRC = thesis.tex introduction.tex benchmark.tex typeparameters.tex functorrep.tex oneparam.tex multiparam.tex multirec.tex multirecabstract.tex multirecparams.tex thesis.bib
+SRC = thesis.tex introduction.tex benchmark.tex typeparameters.tex functorrep.tex oneparam.tex multiparam.tex multirec.tex multirecabstract.tex multirecparams.tex conclusion.tex thesis.bib
 
 .PHONY : clean $(SRC:%.tex=ghci-%)
 
