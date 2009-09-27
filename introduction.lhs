@@ -1,4 +1,7 @@
 \chapter{Introduction}
+%include polycode.fmt
+%include forall.fmt
+%include thesis.fmt
 
 Most programs consist of two parts: structured data, and functionality
 on this data. In functional programming languages like Haskell, these
@@ -59,7 +62,7 @@ functions like fold on these families of data types (see also Section
 \ref{sec:multirec}).
 
 Another limitation of the fixed point view is the representation of
-type parameters. PolyP used functors of kind * -> *, allowing
+type parameters. PolyP used functors of kind |* -> *|, allowing
 meaningful access to one type parameter. Multirec does not have any
 meaningful representation of type parameters. Libraries like LIGD and
 EMGM offer several representations, based on the number of type
