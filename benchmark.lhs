@@ -30,8 +30,8 @@ are reproduced in figure \Todo{add figure and ref}.
 
 The original multirec library could only represent types of kind |*|
 in a way that gave access to the elements of a data type generically.
-This meant that it was impossible to define the functions gmap and
-crushRight. In the benchmark, multirec was rated `bad' when evaluating
+This meant that it was impossible to define the functions |gmap| and
+|crushRight|. In the benchmark, multirec was rated `bad' when evaluating
 it on abstraction over type constructors.
 
 With the extensions defined in this thesis, we believe this rating can
