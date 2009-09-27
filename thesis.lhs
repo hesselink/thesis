@@ -18,7 +18,7 @@
 \setlength{\parskip}{\baselineskip}
 
 \begin{document}
-\title{Generic programming with fixed points for mutually recursive datatypes}
+\title{Generic programming with fixed points for parametrized datatypes}
 \author{Erik Hesselink}
 
 \maketitle
