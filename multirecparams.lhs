@@ -394,7 +394,7 @@ embedding, where the entire data type is converted to a generic
 representation.
 
 For example, when defining a \emph{type indexed data type}, you extend
-a data type in a generic way. This can be used to add metavariables to
+a data type in a generic way. This can be used to add meta-variables to
 a data type to use during term rewriting, to annotate a data type with
 position information during parsing, etc. When you extend the generic
 representation of a type in this way, you want the recursive positions
@@ -453,7 +453,7 @@ type DeepF phi es ix = HFix (PF phi :.: Case es) ix
 
 We can now convert types to the deep embedding. We can either use the
 |Fam| type class and recursively apply the |from| function, or define
-a new typeclass |FamFix|. We will do the latter here, but we do not
+a new type class |FamFix|. We will do the latter here, but we do not
 give instances, which are straightforward: they are the same as
 before, with an extra |Fix| around the functors and a call to |hfrom|
 instead of the |R0| constructor.

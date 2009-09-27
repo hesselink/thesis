@@ -13,14 +13,14 @@ a possibly different type.
 Some functions are specific for a particular data type. For example,
 if we have a function to increase the salary on an employee data type,
 it makes no sense to apply it to a data type representing an
-arithmatic expression. However, many function, like equality, or
+arithmetic expression. However, many function, like equality, or
 binary serialization, can be defined for many data types. Moreover,
 their definition often follows a fixed pattern, making it boring and
 error-prone. Lastly, if the definition of the data type is adapter,
 all these functions have to be adapted as well.
 
 The aim of generic programming is to solve these problems. We define
-generic or type indexed functions, which have different behavious
+generic or type indexed functions, which have different behavior
 depending on the type of the value passed to it. This allows us to
 write a function only once, and reuse it on different data types, or
 on different versions of the same data type.
