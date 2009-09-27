@@ -22,6 +22,7 @@
 \author{Erik Hesselink}
 
 \maketitle
+\setcounter{tocdepth}{1}
 \tableofcontents
 
 \input{introduction}
