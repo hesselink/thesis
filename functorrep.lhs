@@ -10,8 +10,6 @@
 \end{code}
 %endif
 
-\Todo{references: fix-point view, regular, dat andere TF paper}
-
 Generic programming exists thanks to the fact that Haskell algebraic
 data types have a generic structure. A Haskell data type composed of
 \emph{sums} (choices) of constructors, each consisting of
@@ -19,10 +17,10 @@ data types have a generic structure. A Haskell data type composed of
 representation of data types using so-called functors for representing
 such sums and products, we can treat data types generically.
 
-In the \emph{fixed-point} view of a data type, we use an additional
-functor to represent the recursive points in a data type. This allows
-us to write generic functions that exploit knowledge about these
-recursive points, like the |fold|.
+In the \emph{fixed-point} view of a data type \cite{polyp}, we use an
+additional functor to represent the recursive points in a data type.
+This allows us to write generic functions that exploit knowledge about
+these recursive points, like the |fold|.
 
 Let us consider this simple functor representation of data types,
 which uses four different data types:
@@ -70,6 +68,14 @@ toNat    :: PF Nat Nat -> Nat
 toNat (L (K ()))  = Zero
 toNat (R (I n))   = Suc n
 \end{code}
+
+To define actual generic functions on types in this representation, we
+would define a type class for the conversion to and from the generic
+representation. Generic functions can then be defined using a type
+class, with instances for each of the functors. A top level function
+takes care of converting from and to the original data type and
+applying the generic function. For examples, see
+\cite{instantgenerics} and the regular library \cite{web:regular}.
 
 While this is a simple representation, it is powerful enough to
 represent regular Haskell data types without type parameters. Regular
