@@ -1,4 +1,4 @@
-\section{Type parameters}
+\section{Single type parameter}
 \label{sec:oneparam}
 \long\def\ignore#1{}
 %include polycode.fmt
