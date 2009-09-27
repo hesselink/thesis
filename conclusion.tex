@@ -1,9 +1,51 @@
-\chapter{conclusion}
+\chapter{Conclusion}
 \label{cha:conclusion}
 
-\begin{itemize}
-	\item herhaling probleem
-	\item herhalen oplossing: meerdere elems, proofs, ook in multirec, producers/type eq?
-	\item open problemen: composition, vreemd gebruik elems
-	\item vergelijkbare dingen in literatuur
-\end{itemize}
+Many generic programming approaches have problems representing
+parametrized types in a meaningful way. Some resort to duplicating the
+generic machinery once for the different kinds of the data types they
+wish to represent. This leads to code duplication, something generic
+programming set out to avoid.
+
+We have developed an extension to the fixed point view on data types
+that can represent an arbitrary number of type parameters in a
+meaningful way. It uses an container to hold elements of data types
+that is indexed by the type parameter position. The index is
+restricted to natural numbers, defined on the type level.
+
+This indexed container consists two data types, one adding types to a
+list of types to choose from, the other ending the list. Functions on
+this container are defined by two type class instances, one on each of
+these data types. Sometimes (most notably in producer functions) a
+proof is needed that the index is restricted to natural numbers. We
+have defined such proofs, as well as a type class to easily generate
+them.
+
+Additionally, we have integrated this approach in the multirec
+library, which extends the fixed point view to allow representation of
+families of mutually recursive data types. Thus, we can represent
+parametrized families. This requires changing the indices on the
+functors that multirec uses to type level numbers instead of concrete
+types from the family.
+
+One open problem is composition of types in multirec. Ideally, one
+would be able to define a generic representation for lists, for
+example, and later reuse this representation when representing a
+family which uses lists. Currently this is only possible by defining
+the list representation in the family itself, duplicating the work.
+
+A limitation of the current approach of integrating our extension with
+multirec, is that the family is parametrized, not the separate types.
+This means that if a type occurs multiple times in a family, each time
+applied to different parameters, we cannot represent it. It might be
+possible to solve this problem by explicitly representing type
+abstraction and application, instead of tagging the parameters of
+the family.
+
+Both multirec and our extension use the notion of indexed functors.
+These are related to the indexed containers described in
+\cite{indexedcontainers}.  Similar indexed functors for generic
+programming in Haskell are being developed by Conor McBride. In the
+future, the combination of these ideas will hopefully lead to a
+generic programming library that can conveniently represent an even
+larger range of Haskell data types.
