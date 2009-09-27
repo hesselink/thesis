@@ -25,8 +25,8 @@
 \tableofcontents
 
 \input{introduction}
-\input{benchmark}
 \input{typeparameters}
+\input{benchmark}
 \input{conclusion}
 \bibliographystyle{plain}
 \bibliography{thesis}
