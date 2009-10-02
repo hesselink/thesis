@@ -6,6 +6,7 @@
 %format :>: = "\rhd"
 %format ~ = "\sim"
 %format phi = "\phi"
+%format phi' = "\phi{''}"
 % */where spacing magic
 %format where = "\where "
 %format * = "*\let\where\spacewhere "
