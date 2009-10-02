@@ -11,7 +11,7 @@ thesis.pdf : $(SRC)
 %.tex : %.lagda
 	lhs2TeX --agda -o $@ $<
 
-%.tex : %.lhs
+%.tex : %.lhs thesis.fmt
 	lhs2TeX -o $@ $<
 
 preview :
