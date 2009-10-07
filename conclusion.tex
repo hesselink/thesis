@@ -9,14 +9,14 @@ programming set out to avoid.
 
 We have developed an extension to the fixed point view on data types
 that can represent an arbitrary number of type parameters in a
-meaningful way. It uses an container to hold elements of data types
-that is indexed by the type parameter position. The index is
+meaningful way. It uses an container that is indexed by the type
+parameter position to hold elements of data types. The index is
 restricted to natural numbers, defined on the type level.
 
-This indexed container consists two data types, one adding types to a
-list of types to choose from, the other ending the list. Functions on
-this container are defined by two type class instances, one on each of
-these data types. Sometimes (most notably in producer functions) a
+This indexed container consists of two data types, one adding types to
+a list of types to choose from, the other ending the list. Functions
+on this container are defined by two type class instances, one on each
+of these data types. Sometimes (most notably in producer functions) a
 proof is needed that the index is restricted to natural numbers. We
 have defined such proofs, as well as a type class to easily generate
 them.

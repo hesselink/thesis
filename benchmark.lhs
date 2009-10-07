@@ -6,7 +6,7 @@
 
 For the past years, research on generic programming in Haskell has
 been a hot topic, and as a result, the number of libraries for
-generics programming in Haskell has exploded. On the one hand, this
+generic programming in Haskell has exploded. On the one hand, this
 is a good thing: it allows us to compare and evaluate different
 approaches to generic programming. On the other hand, this makes it
 hard to choose a library for generic programming, especially since it
@@ -51,10 +51,10 @@ If elements are not present, the extra complexity is minimal. One
 element data types can use the |E0| container, which is a regular ADT.
 For representations of (families of) data types with multiple
 elements, complexity is higher, as this requires the use of the
-indexed element container type |(:||:)|. Additionally, an additional
-type class is needed to mirror an existing type class for indexed
-elements.  For example, when defining the |gleft| function
-(Section \ref{sec:producers}), we need both a |Small| type class to generate
+indexed element container type |(:||:)|. An additional type class is
+needed to mirror an existing type class for indexed elements.  For
+example, when defining the |gleft| function (Section
+\ref{sec:producers}), we need both a |Small| type class to generate
 normal values, and a |SmallEl| type class to generate indexed values.
 
 Since the ease of use of the multirec library was already low, and the
