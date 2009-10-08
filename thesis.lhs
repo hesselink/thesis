@@ -1,4 +1,4 @@
-\documentclass[draft, 11pt, twoside, dvipdfm, a4paper, openright]{report}
+\documentclass[11pt, twoside, dvipdfm, a4paper, openright]{report}
 \usepackage{pxfonts}
 %include polycode.fmt
 % if also including lagda, use the following instead, and rename to .lagda:
@@ -12,10 +12,20 @@
 \usepackage{natbib}
 \usepackage{hyperref}
 \usepackage[pdftex]{graphicx}
+\usepackage{fancyhdr}
 \bibpunct{[}{]}{,}{n}{,}{,}
+
+\fancyhf{}
+\fancyhead[LO]{\textsc{\rightmark}}
+\fancyhead[RE]{\textsc{\leftmark}}
+\fancyhead[LE,RO]{\thepage}
+
+\pagestyle{fancy}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{\baselineskip}
+\setlength{\headheight}{14pt}
+
 
 \begin{document}
 \title{Generic programming with fixed points for parametrized datatypes}
