@@ -28,13 +28,11 @@ indicate the number of type parameters, and to indicate which type
 parameter an element corresponds to.
 
 In a dependently typed programming language, we can apply this idea
-directly. \Todo{How do I insert Agda code in here?}
-
-In Haskell, we can represent this as follows: we use a GADT containing
-the types of all the elements. The constructors of this GADT hold a
-value of one of these types, and we use a type level number to
-indicate which one. This way, we can recover the type of the element
-by pattern matching of the GADT. The functors now become:
+directly. In Haskell, we can represent this as follows: we use a GADT
+containing the types of all the elements. The constructors of this
+GADT hold a value of one of these types, and we use a type level
+number to indicate which one. This way, we can recover the type of the
+element by pattern matching of the GADT. The functors now become:
 
 \begin{code}
 data K a        (es :: * -> *) r = K a

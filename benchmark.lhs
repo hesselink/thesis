@@ -23,10 +23,7 @@ application.
 
 Although the technical report does not include a benchmark for the
 multirec \cite{multirec} library, this is included in Alexey
-Rodriguez' thesis \cite{thesis_alexey}. The results of this benchmark
-are reproduced in figure \Todo{add figure and ref}.
-
-\Todo{check if universe size is increased}
+Rodriguez' thesis \cite{thesis_alexey}. 
 
 The original multirec library could only represent types of kind |*|
 in a way that gave access to the elements of a data type generically.
@@ -61,5 +58,3 @@ Since the ease of use of the multirec library was already low, and the
 added complexity of our extension scales with the number of type
 parameters you need to support, we feel we have not increased the
 complexity of the library substantially.
-
-\Todo{automatic generation of instances?}
