@@ -385,6 +385,16 @@ roundExpr :: Expr Double -> Expr Integer
 roundExpr = gmap (E0 . round . unE0) Expr Expr
 \end{spec}
 
+We have shown how to integrate the extension to the fixed point view
+on data types we developed in Section \ref{sec:multiparam} into the
+multirec approach (Section \ref{sec:multirec}). Rather than add an
+extra argument to the functors, we have exploited the similarity
+between the indexed element container in our extension and the indexed
+recursive positions in multirec. We use |Case|, which is similar to an
+indexed |Either|, to store both in the |I| functor. With this
+extension, we can define |gmap| for families of mutually recursive
+data types.
+
 \subsection{Deep embedding}
 
 So far, we have used a shallow embedding: at the recursive positions,
@@ -569,9 +579,9 @@ instance (HZero prf f, HZero prf g) => HZero prf (f :*: g) where
 \end{spec}
 
 The instance for |:>:| is more interesting. Remember that this data
-type is a GADT, with on constructor, |Tag|, which constrains its first
-type argument (which we will call |xi| here) and its index |ix| to be
-the same type.
+type is a GADT, with one constructor, |Tag|, which constrains its
+first type argument (which we will call |xi| here) and its index |ix|
+to be the same type.
 
 The code we wish to write is simple: we want to call |hzero|
 recursively, and wrap the result in |Tag|. However, which proof do we
@@ -706,6 +716,16 @@ gleft p = to p $ hzero gcase (CR (Proof p)) True
     rec :: forall ix. Proof (phi es) ix -> Bool -> R0 phi es ix
     rec (Proof p) left = R0 p (gleft p)
 \end{spec}
+
+We have shown how to define a generic producer function |gleft| for
+families of mutually recursive data types, which produces a
+left-biased value of a data type. The use of a GADT which restricts
+the index of our functors in the generic representation required
+equality testing on types. We have shown how to do so using the |EqS|
+type class. We have also shown how to prove this equality to the type
+checker using the |(:=:)| type. We even needed the congruence property
+of equality, bringing Haskell programming closer to the realm of proof
+assistants and dependently typed programming languages.
 
 %if style == newcode
 \begin{spec}
