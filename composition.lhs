@@ -1,4 +1,4 @@
-\section{Composition}
+\chapter{Composition}
 %include polycode.fmt
 %include forall.fmt
 %include thesis.fmt

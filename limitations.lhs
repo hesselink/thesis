@@ -1,4 +1,4 @@
-\section{Limitations}
+\chapter{Limitations}
 %include polycode.fmt
 %include forall.fmt
 %include thesis.fmt
