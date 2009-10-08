@@ -798,11 +798,11 @@ mapping the fold on all recursive positions, and the applying the
 algebra on the top level functor.
 
 \begin{spec}
-fold :: forall phi ix r . (Fam phi, HFunctor phi (PF phi), Fold (PF phi)) =>
-        Algebra phi r -> phi ix -> ix -> r ix
-fold f p = alg (f p) .
-           hmap (\ p (I0 x) -> fold f p x) .
-           from p
+fold ::  forall phi ix r . (Fam phi, HFunctor phi (PF phi), Fold (PF phi)) =>
+         Algebra phi r -> phi ix -> ix -> r ix
+fold f p =  alg (f p) .
+            hmap (\ p (I0 x) -> fold f p x) .
+            from p
 \end{spec}
 
 To adapt this fold to support the extension of multirec with elements,
@@ -812,11 +812,7 @@ for one element type, or an empty type in case the family has no type
 parameters.
 
 \begin{spec}
-type family Alg (f :: (* -> *) -> * -> *) 
-                (l :: * -> *)      -- elements
-                (r :: * -> *)      -- recursive positions
-                (ix :: *)          -- index
-                :: *
+type family Alg  (f :: (* -> *) -> * -> *) (l :: * -> *) (r :: * -> *) (ix :: *) :: *
 \end{spec}
 
 We split the type family instance for |I| into two parts, on for a
@@ -839,8 +835,8 @@ type at that index.
 \begin{spec}
 type family ElTy (es :: * -> *) (ix :: *) :: *
 
-type instance ElTy (a :|: b) Zero = a
-type instance ElTy (a :|: b) (Suc n) = ElTy b n
+type instance ElTy (a :|: b) Zero     = a
+type instance ElTy (a :|: b) (Suc n)  = ElTy b n
 \end{spec}
 
 The instances for |(:||:)| are straightforward. At index |Zero|, we
@@ -897,8 +893,8 @@ instance ElemContainer Nil where
   get = magic
 
 instance ElemContainer b => ElemContainer (a :|: b) where
-  get (Z x) = x
-  get (S x) = get x
+  get (Z  x) = x
+  get (S  x) = get x
 \end{spec}
 
 On the |Fold| instance for |I| at a |Left| index, we now require an
@@ -916,11 +912,11 @@ also have to explicitly type the function we map over the recursive
 positions, as we did before.
 
 \begin{spec}
-fold :: forall phi es a ix r . (Fam phi es, HFunctor (FamPrf phi es) (PF phi), Fold es (PF phi)) =>
-        Algebra phi es r -> phi es a ix -> a -> r ix
-fold f p = alg (f p) .
-           rmap rec (CR (Proof p)) .
-           from p
+fold ::  forall phi es a ix r . (Fam phi es, HFunctor (FamPrf phi es) (PF phi), Fold es (PF phi)) =>
+         Algebra phi es r -> phi es a ix -> a -> r ix
+fold f p =  alg (f p) .
+            rmap rec (CR (Proof p)) .
+            from p
   where
     rec :: forall ix a b. Proof (phi es) ix -> R0 phi es ix -> r ix
     rec _ (R0 p x) = fold f p x
@@ -932,8 +928,8 @@ over them like this:
 
 \begin{spec}
 treeAlg :: Algebra TreeU (Int :|: String :|: Nil) Int
-treeAlg _ = (\e -> e)
-          & (\n e o -> n + length e + o)
+treeAlg _  =  (\e -> e)
+           &  (\n e o -> n + length e + o)
 \end{spec}
 
 The first part of the algebra applies to |Leaf| constructors, which
