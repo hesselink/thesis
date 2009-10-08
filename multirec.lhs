@@ -259,8 +259,9 @@ compos f p = to p . hmap (\p -> I0 . f p . unI0) . from p
 
 The multirec paper \cite{multirec} and the corresponding library
 contain further examples, including a |fold| function with convenient
-algebras. The library also supports template Haskell generation of the
-pattern functor and the |from| and |to| functions.
+algebras. The library also supports Template Haskell
+\cite{Sheard02templatemeta-programming} generation of the pattern
+functor and the |from| and |to| functions.
 
 Using the multirec approach, we can generically represent families of
 mutually recursive data types, and access the recursive points in a
