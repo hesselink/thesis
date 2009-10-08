@@ -44,7 +44,7 @@ type instance TU  = (I (Rec (Suc Zero)) :+: I (Rec (Suc Zero)))  :>: Zero
 \end{spec}
 
 To solve this problem, one would have to model type application and
-absraction. Then, we could indicate in the two |I| occurences
+abstraction. Then, we could indicate in the two |I| occurrences
 representing the two constructors of |A| to which type argument |B| is
 applied. It is not clear yet how to model type abstraction in this
 way.

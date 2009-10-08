@@ -890,7 +890,7 @@ instance ElemContainer l => Fold l (I (Left xi)) where
   alg f (I (CL x)) = f (get x)
 \end{spec}
 
-The |fold| function inself doesn't change conceptually. We change
+The |fold| function itself doesn't change conceptually. We change
 |hmap| to |rmap|, which maps only over the right part of a |Case|. We
 also have to explicitly type the function we map over the recursive
 positions, as we did before.

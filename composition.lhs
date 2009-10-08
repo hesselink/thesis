@@ -284,7 +284,7 @@ unCompI = map (unI0 . unI) . F.unI0 . F.unI . unComp
 \end{code}
 
 If we try to apply this approach to the representation that allows
-multiple type parameters, as shown in Secion \ref{sec:multirecparams},
+multiple type parameters, as shown in Section \ref{sec:multirecparams},
 we have to ask the question: what do we mean by this composition.
 Since these types can have multiple parameters, it is not clear at
 which parameter we're applying the composition.
