@@ -164,10 +164,10 @@ parameter, like the |Either| type, except by representing the first
 type parameter using the |K| constructor. If we do this we once again
 use the ability to use this element value in generic functions.
 
-The approach of using functors of kind |* -> *| to represent data types with
-one type parameter has been used before, for example in PolyP \cite{polyp}.
-Other generic programming approaches, for example EMGM \cite{emgm}, also use
-representations of different arities to represent data types with different
-numbers of type parameters. While this approach does work, it means that
-separate generic machinery has to be implemented for each number of type
-parameters.
+The approach of using functors of kind |* -> *| to represent data
+types with one type parameter has been used before, for example in
+PolyP \cite{polyp}.  Other generic programming approaches also use
+representations of different arities to represent data types with
+different numbers of type parameters. While this approach does work,
+it means that separate generic machinery has to be implemented for
+each number of type parameters.

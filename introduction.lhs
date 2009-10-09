@@ -64,13 +64,13 @@ use of generic functions like fold on these families of data types
 Another limitation of the fixed point view is the representation of
 type parameters. PolyP used functors of kind |* -> *|, allowing
 meaningful access to one type parameter. Multirec does not have any
-meaningful representation of type parameters. Libraries like LIGD and
-EMGM offer several representations, based on the number of type
-parameters. This means that parts of your generic programming library
-have to be implemented multiple times, once for each representation.
-In this thesis, we will develop an extension of the fixed point view
-that allows us to represent an arbitrary number of type parameters in
-a meaningful way.
+meaningful representation of type parameters. Some libraries offer
+several representations, based on the number of type parameters. This
+means that parts of your generic programming library have to be
+implemented multiple times, once for each representation.  In this
+thesis, we will develop an extension of the fixed point view that
+allows us to represent an arbitrary number of type parameters in a
+meaningful way.
 
 In chapter \ref{cha:typeparameters}, we will develop this extension.
 We will do this gradually, starting with a simple fixed point view. We
