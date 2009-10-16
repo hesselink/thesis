@@ -345,9 +345,8 @@ Writing one of each of these classes of functions is a good way to
 test the quality of a generic programming framework: it should be
 possible to express all of these functions in a framework. So far, we
 have only written a transformer. We will now write a generic producer;
-producers can often highlight shortcomings of the implementation,
-since they do something interesting: they produce values `out of
-nowhere'.
+producers often highlight shortcomings of the implementation, since
+they do something interesting: they produce values `out of nowhere'.
 
 We will implement the `generic zero': a function that produces the
 smallest value of a data type. For example, for lists, it would produce

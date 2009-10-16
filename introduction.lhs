@@ -3,11 +3,10 @@
 %include forall.fmt
 %include thesis.fmt
 
-Most programs consist of two components: structured data, and
-functionality on this data. In functional programming languages like
-Haskell, these two things are separate. Data is defined by of
+In functional programming, we can distinguish two important concepts:
+structured data, and functionality on this data. Data is defined by
 algebraic data types (ADTs), consisting of one or more constructors
-with zero or more fields.  Functions work on these data types,
+with zero or more fields. Functions work on these data types,
 transforming values into values of a possibly different type.
 
 Some functions are specific for a particular data type. For example,

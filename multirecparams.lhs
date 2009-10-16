@@ -552,8 +552,8 @@ If we were to tag the functors at top level with indices without a
 proofs, and so have indices |Left| and |Right|. This means we would
 need to parametrize the |HZero| type class over \emph{two} proofs, and
 instantiate the first proof to |FamPrf phi es| and the second to
-|Proof (phi es)|. By tagging with |Rec n|, we avoid this and can use a
-single proof type.
+|Proof (phi es)|. By tagging with |Rec n|, we avoid this and can
+parametrize over a single proof type.
 
 The instances for |I|, |K|, |:+:| and |:*:| are similar to those in
 Section \ref{sec:multiparam:producers}. In the |I| case, we apply the
