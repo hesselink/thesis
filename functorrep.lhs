@@ -4,6 +4,7 @@
 %include thesis.fmt
 %if style == newcode
 \begin{code}
+{-# OPTIONS_GHC -F -pgmF lhs2tex -optF --pre #-}
 {-# LANGUAGE TypeFamilies
            , TypeOperators
            #-}

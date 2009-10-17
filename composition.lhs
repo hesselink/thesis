@@ -10,6 +10,7 @@
 %if style == newcode
 %format ldots = "-- "
 \begin{code}
+{-# OPTIONS_GHC -F -pgmF lhs2tex -optF --pre #-}
 {-# LANGUAGE TypeFamilies
            , TypeOperators
            , GADTs
