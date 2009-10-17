@@ -5,7 +5,7 @@
 %include thesis.fmt
 %options ghci -fglasgow-exts -pgmL lhs2tex -optL --pre
 %if style == newcode
-\begin{spec}
+\begin{code}
 {-# LANGUAGE TypeFamilies
            , TypeOperators
            , GADTs
@@ -18,7 +18,7 @@
            , TypeSynonymInstances
            , ScopedTypeVariables
            #-}
-\end{spec}
+\end{code}
 %endif
 
 We could add elements to the representation of mutually recursive
@@ -34,14 +34,14 @@ similar for indexed types. We will call this type |Case|, and just
 like |Either| has two constructors |Left| and |Right|, |Case| has
 constructors |CL| and |CR|.
 
-\begin{spec}
+\begin{code}
 data Left ix
 data Right ix
 
 data Case :: (kl -> *) -> (kr -> *) -> (keitherlr -> *) where
   CL  :: l  ix -> Case l r (Left   ix)
   CR  :: r  ix -> Case l r (Right  ix)
-\end{spec}
+\end{code}
 
 |Case| itself is indexed, but not with the index |ix| of the type it contains,
 but with index |Left ix| or |Right ix|, depending on which constructor is used.
@@ -54,7 +54,7 @@ within. This grants us more type safety, and prevents us from having to define
 % This code is the same as in the previous section, so it is not shown
 % in the pdf.
 %if style == newcode
-\begin{spec}
+\begin{code}
 data K a        (r :: * -> *) ix = K a
 data I xi       (r :: * -> *) ix = I (r xi)
 data (f :+: g)  (r :: * -> *) ix = L (f r ix) | R (g r ix)
@@ -65,43 +65,43 @@ infixr 8 :*:
 
 data (f :>: xi)  (r :: * -> *) ix where
   Tag :: f r ix -> (f :>: ix) r ix
-\end{spec}
+\end{code}
 %endif
 
 We will adapt the running example slightly. Instead of storing |Int|s
 as constants in our expression language, we will parametrize |Expr|
 and |Decl| with the type of the constants:
 
-\begin{spec}
+\begin{code}
 data Expr a  =  Const a
              |  Add (Expr a) (Expr a)
              |  Mul (Expr a) (Expr a)
              |  EVar Var
              |  Let (Decl a) (Expr a)
-\end{spec}
+\end{code}
 %if style == newcode
-\begin{spec}
+\begin{code}
              deriving Show
-\end{spec}
+\end{code}
 %endif
 
-\begin{spec}
+\begin{code}
 data Decl a  =  Var := (Expr a)
              |  Seq (Decl a) (Decl a)
-\end{spec}
+\end{code}
 %if style == newcode
-\begin{spec}
+\begin{code}
              deriving Show
-\end{spec}
+\end{code}
 %endif
 
-\begin{spec}
+\begin{code}
 
 type Var     =  String
 
 data Zero
 data Suc a
-\end{spec}
+\end{code}
 
 We will use the |Case| type to store both the elements and the
 recursive values in the |I| functor. This means that we will have |I|
@@ -114,7 +114,7 @@ indicating that the constants in our expression language are now
 polymorphic, and their type is indicated by the first type parameter,
 instead of being fixed to |Int|
 
-\begin{spec}
+\begin{code}
 type Elem  = Left
 type Rec   = Right
 
@@ -131,7 +131,7 @@ type PFAST  =    (    I (Elem Zero)
 
 type family PF phi :: (knat -> *) -> knat -> *
 type instance PF AST = PFAST
-\end{spec}
+\end{code}
 
 We need an indexed type to hold elements. However, since we only have
 one element type in this example, we will use a simple wrapper type
@@ -146,14 +146,14 @@ representing families with multiple type parameters, this also allows
 us to indicate which parameter position is corresponds to which
 element type in each family type.
 
-\begin{spec}
+\begin{code}
 data E0 a ix = E0 { unE0 :: a }
 
 data AST :: (knat -> *) -> kphi -> knat -> * where
   Expr  :: AST (E0 a) (Expr a)  Zero
   Decl  :: AST (E0 a) (Decl a)  (Suc Zero)
   Var   :: AST (E0 a) Var       (Suc (Suc Zero))
-\end{spec}
+\end{code}
 
 We extend |R0| with an extra type parameter to hold the element types.
 We then define the |Fam| type class again, using |Case| at the
@@ -164,7 +164,7 @@ and |CR| for recursive values.
 %% De types in from en to staan niet netjes onder elkaar omdat dat
 %% niet past.
 
-\begin{spec}
+\begin{code}
 data R0 :: ((knat -> *) -> * -> knat -> *) -> (knat -> *) -> knat -> * where
   R0 :: phi es a ix -> a -> R0 phi es ix
 
@@ -200,12 +200,12 @@ instance Fam AST (E0 a) where
                            = Seq d1 d2
   to    Var   (R (R (Tag (K s))))
                            = s
-\end{spec}
+\end{code}
 
 % This code is the same as in the previous section, so it is not shown
 % in the pdf.
 %if style == newcode
-\begin{spec}
+\begin{code}
 data Proof :: (* -> * -> *) -> * -> * where
   Proof :: phi a ix -> Proof phi ix
 
@@ -221,7 +221,7 @@ instance El NatPrf Zero where
 
 instance El NatPrf a => El NatPrf (Suc a) where
   proof = PS proof
-\end{spec}
+\end{code}
 %endif
 
 We make no change to the |El| type class (which indicates that an
@@ -242,7 +242,7 @@ or |Right ix| are part of the type |Case pl pr|. We also define a type
 synonym for the type of proofs for families of recursive types with
 elements.
 
-\begin{spec}
+\begin{code}
 instance El (Proof (AST (E0 a)))  Zero              where proof = Proof Expr
 instance El (Proof (AST (E0 a)))  (Suc Zero)        where proof = Proof Decl
 instance El (Proof (AST (E0 a)))  (Suc (Suc Zero))  where proof = Proof Var
@@ -254,12 +254,12 @@ instance El pr ix => El (Case pl pr) (Right ix) where
   proof = CR proof
 
 type FamPrf phi (es :: knat -> *) = Case NatPrf (Proof (phi es))
-\end{spec}
+\end{code}
 
 % This code is the same as in the previous section, so it is not shown
 % in the pdf.
 %if style == newcode
-\begin{spec}
+\begin{code}
 class HFunctor phi f where
   hmap :: (forall ix. phi ix -> r ix -> r' ix) -> f r ix -> f r' ix
 
@@ -278,7 +278,7 @@ instance (HFunctor phi f, HFunctor phi g) => HFunctor phi (f :*: g) where
 
 instance HFunctor phi f => HFunctor phi (f :>: xi) where
   hmap f (Tag x) = Tag (hmap f x)
-\end{spec}
+\end{code}
 %endif
 
 The code for |HFunctor| and |hmap| again stays unchanged. However,
@@ -292,13 +292,13 @@ given a |Case| of proofs to match.
 Note that since the type indicates that the indices for the proof and
 the value are the same, we only need to (and indeed, only can) give
 the cases where both are either a |CL| or a |CR|.
-\begin{spec}
+\begin{code}
 (<?>) ::  (forall ix. pl  ix -> f  ix -> f'  ix) ->
           (forall ix. pr  ix -> g  ix -> g'  ix) ->
           Case pl pr ix -> Case f g ix -> Case f' g' ix
 (f <?> g) (CL p) (CL x) = CL (f p x)
 (f <?> g) (CR p) (CR y) = CR (g p y)
-\end{spec}
+\end{code}
 
 We can now define |compos| again. We use |<?>| to pass two functions,
 |el| and |rec|, to |hmap|, one for the elements, and the other for the
@@ -307,7 +307,7 @@ signature, as it is no longer possible to infer these correctly in the
 presence of higher-rank polymorphism. The |el| function does nothing,
 while the |rec| function is the same as before.
 
-\begin{spec}
+\begin{code}
 compos ::  forall phi es a ix. (Fam phi es, HFunctor (FamPrf phi es) (PF phi)) =>
            (forall a ix. phi es a ix -> a -> a) -> phi es a ix -> a -> a
 compos f p = to p . hmap (el <?> rec) . from p
@@ -316,21 +316,21 @@ compos f p = to p . hmap (el <?> rec) . from p
     el  = const id
     rec :: forall ix. Proof (phi es) ix -> R0 phi es ix -> R0 phi es ix
     rec _ (R0 p x) = R0 p (f p x)
-\end{spec}
+\end{code}
 
 As an example, we use compos to add one to all the constants in a
 term. We do this by requiring a |Num| constraint on the element type,
 and then pattern matching on the |Const| constructor of the |Expr|
 type.
 
-\begin{spec}
+\begin{code}
 addOne :: Num a => Expr a -> Expr a
 addOne = addOne' Expr
   where
     addOne' :: Num a => AST (E0 a) b ix -> b -> b
     addOne' Expr (Const i)  = Const (i + 1)
     addOne' p    x          = compos addOne' p x
-\end{spec}
+\end{code}
 
 While it is fine to use |compos| to do this, |gmap| would be more
 suited for the task. With everything in place now, we can finally
@@ -353,7 +353,7 @@ This provides us with a proof of |phi es' b ix| instead of |phi es a
 ix| in |rec|, which it needs for the call to |gmap| and to wrap the
 resulting value in an |R0| again.
 
-\begin{spec}
+\begin{code}
 gmap ::  forall phi es es' a b ix. (Fam phi es, Fam phi es', HFunctor (FamPrf phi es') (PF phi)) =>
          (forall ix. es ix -> es' ix) -> phi es a ix -> phi es' b ix -> a -> b
 gmap f pfrom pto = to pto . hmap (el <?> rec) . from pfrom
@@ -362,17 +362,17 @@ gmap f pfrom pto = to pto . hmap (el <?> rec) . from pfrom
     el = const f
     rec :: forall ix. Proof (phi es') ix -> R0 phi es ix -> R0 phi es' ix
     rec (Proof pto) (R0 pfrom x) = R0 pto (gmap f pfrom pto x)
-\end{spec}
+\end{code}
 
 We can now write the |addOne| function using |gmap|. To transform the
 elements, we unwrap the |E0|, add one, and wrap again. We pass in
 |Expr| twice, once to indicate the input type, and once to indicate
 the output type.
 
-\begin{spec}
+\begin{code}
 addOne2 :: Num a => Expr a -> Expr a
 addOne2 = gmap (E0 . (+1) . unE0) Expr Expr
-\end{spec}
+\end{code}
 
 One thing we cannot do with |compos| is change the type of the
 elements in an expression, since the transformation function has type
@@ -380,10 +380,10 @@ elements in an expression, since the transformation function has type
 function takes an expression of doubles, and rounds all constants to
 produce an expression of integers.
 
-\begin{spec}
+\begin{code}
 roundExpr :: Expr Double -> Expr Integer
 roundExpr = gmap (E0 . round . unE0) Expr Expr
-\end{spec}
+\end{code}
 
 We have shown how to integrate the extension to the fixed point view
 on data types we developed in Section \ref{sec:multiparam} into the
@@ -426,9 +426,9 @@ data type is also possible. This data type is itself indexed, but is
 otherwise similar to |Fix| above. We will call it |HFix|, and define
 it as:
 
-\begin{spec}
+\begin{code}
 data HFix (f :: (kphi -> *) -> kphi -> *) ix = HIn { hout :: f (HFix f) ix }
-\end{spec}
+\end{code}
 
 This data type can be used to create a deep embedding using the indexed
 functors without elements. When we introduce elements, however, we
@@ -445,9 +445,9 @@ composition to write this as |(f . g) x|. We can also do this at the
 type level, using \emph{functor composition} to flatten the nested
 type applications at the recursive positions above:
 
-\begin{spec}
+\begin{code}
 data (f :.: g) (r :: * -> *) ix = Comp { unComp :: (f (g r) ix) }
-\end{spec}
+\end{code}
 
 We can now rewrite the type |DeepF| above as:
 
@@ -468,11 +468,11 @@ give instances, which are straightforward: they are the same as
 before, with an extra |Fix| around the functors and a call to |hfrom|
 instead of the |R0| constructor.
 
-\begin{spec}
+\begin{code}
 class FamFix phi es where
   hfrom  ::  phi es a ix  -> a                             -> HFix (PF phi :.: Case es) ix
   hto    ::  phi es a ix  -> HFix (PF phi :.: Case es) ix  -> a
-\end{spec}
+\end{code}
 
 To write functions that operate on this fixpoint representation, the
 type classes like |HFunctor| don't have to change: they make no
@@ -485,7 +485,7 @@ This function does the actual work, unwrapping the |HFix| and |Comp|,
 applying the function |f| to the elements, and calling itself at the
 recursive positions, and finally wrapping in |Comp| and |HFix| again.
 
-\begin{spec}
+\begin{code}
 gmapFix ::  forall phi es es' a b ix.
             (FamFix phi es, FamFix phi es', HFunctor (FamPrf phi es) (PF phi)) =>
             (forall ix. es ix -> es' ix) -> phi es a ix -> phi es' b ix -> a -> b
@@ -501,7 +501,7 @@ gmapFixF f _ = HIn . Comp . hmap (el <?> rec) . unComp . hout
     rec ::  forall ix. Proof (phi es) ix ->
             HFix (PF phi :.: Case es) ix -> HFix (PF phi :.: Case es') ix
     rec = gmapFixF f
-\end{spec}
+\end{code}
 
 We have shown how to use a generic representation that uses a deep
 embedding, where the recursive positions of a data type are also
@@ -541,10 +541,10 @@ function and |hzero| itself take a proof and a boolean argument. The
 proof restricts the index being generated, and the boolean indicates
 whether to create an |L| or an |R| constructor in the sum case.
 
-\begin{spec}
+\begin{code}
 class HZero prf f where
   hzero :: (forall ix. prf ix -> Bool -> r ix) -> prf ix -> Bool -> f r ix
-\end{spec}
+\end{code}
 
 This function shows the need to tag with |Rec n| instead of just |n|.
 If we were to tag the functors at top level with indices without a
@@ -563,7 +563,7 @@ generate concrete values. In case of a sum, we use the boolean
 argument to choose either |L| or |R|, and for a product we generate
 both sides and combine them.
 
-\begin{spec}
+\begin{code}
 instance El prf xi => HZero prf (I xi) where
   hzero f _ left = I (f proof left)
 
@@ -576,7 +576,7 @@ instance (HZero prf f, HZero prf g) => HZero prf (f :+: g) where
 
 instance (HZero prf f, HZero prf g) => HZero prf (f :*: g) where
   hzero f p left = hzero f p left :*: hzero f p left
-\end{spec}
+\end{code}
 
 The instance for |:>:| is more interesting. Remember that this data
 type is a GADT, with one constructor, |Tag|, which constrains its
@@ -608,12 +608,12 @@ checker between these two types.
 The equality type is defined as follows. It takes two type arguments,
 but the only constructor constrains these types to be the same.
 
-\begin{spec}
+\begin{code}
 data (:=:) :: * -> * -> * where
   Refl :: a :=: a
 
 infix 4 :=:
-\end{spec}
+\end{code}
 
 The type class for testing type equality will be called |EqS|. It
 takes two proofs at different indices, and compares the indices for
@@ -634,7 +634,7 @@ instances, we need the congruence property of equality: if we know
 that |a :=: b|, then we also know that |f a :=: f b|. We can prove
 this using the function |eqCong|.
 
-\begin{spec}
+\begin{code}
 class EqS prf where
   eqS :: prf ix -> prf ix' -> Maybe (ix :=: ix')
 
@@ -656,7 +656,7 @@ instance (EqS prf1, EqS prf2) => EqS (Case prf1 prf2) where
   eqS (CL p1)  (CL p2)  = fmap eqCong (eqS p1 p2)
   eqS (CR p1)  (CR p2)  = fmap eqCong (eqS p1 p2)
   eqS _        _        = Nothing
-\end{spec}
+\end{code}
 
 We can now bring all this together to give the instance for |:>:|. We
 require an instance |El prf xi| so we can produce a proof |prf xi|. We
@@ -671,14 +671,14 @@ specifying a type signature. Therefor, instead of changing the
 signature of |hzero| to deal with errors by using |Maybe| or |Either|,
 we use the |error| function.
 
-\begin{spec}
+\begin{code}
 instance (HZero prf f, El prf xi, EqS prf) => HZero prf (f :>: xi) where
   hzero f p left = let p' = proof :: prf xi in
     case eqS p p' of
       Just Refl -> Tag (hzero f p' left)
       Nothing   -> error
         "Indices ix and xi do not match in HZero instance for :>:."
-\end{spec}
+\end{code}
 
 Before we can define the top level function |gleft|, we need to be
 able to generate values of |Case f g ix|, given functions to create |f
@@ -687,13 +687,13 @@ function is fairly straightforward: we take a |Case| of two proof
 arguments and pattern match on it. If it is a |CL|, we produce a |CL|
 with an |f| inside, and similarly for |CR| and |g|.
 
-\begin{spec}
+\begin{code}
 hzeroC ::  (forall ix. prf  ix -> Bool -> f ix) ->
            (forall ix. prf' ix -> Bool -> g ix) ->
            Case prf prf' ix -> Bool -> Case f g ix
 hzeroC f g (CL p)  left = CL  (f  p left)
 hzeroC f g (CR p)  left = CR  (g  p left)
-\end{spec}
+\end{code}
 
 Now we can tie all this together in the top level function |gleft|,
 which generates left-biased values for any type in a family |phi|. The
@@ -706,7 +706,7 @@ before, type signatures are required because of pattern matching on
 existential values, and to constrain the type of |phi| to match
 between the top-level definition and the local definitions.
 
-\begin{spec}
+\begin{code}
 gleft ::  forall phi es a ix. (Fam phi es, HZero (FamPrf phi es) (PF phi), SmallEl NatPrf es) =>
           phi es a ix -> a
 gleft p = to p $ hzero gcase (CR (Proof p)) True
@@ -715,7 +715,7 @@ gleft p = to p $ hzero gcase (CR (Proof p)) True
     gcase = hzeroC (const . smallEl) rec
     rec :: forall ix. Proof (phi es) ix -> Bool -> R0 phi es ix
     rec (Proof p) left = R0 p (gleft p)
-\end{spec}
+\end{code}
 
 We have shown how to define a generic producer function |gleft| for
 families of mutually recursive data types, which produces a
@@ -728,7 +728,7 @@ of equality, bringing Haskell programming closer to the realm of proof
 assistants and dependently typed programming languages.
 
 %if style == newcode
-\begin{spec}
+\begin{code}
 class SmallEl prf es where
   smallEl :: prf ix -> es ix
 
@@ -743,7 +743,7 @@ instance Small [a] where small = []
 
 instance Small a => SmallEl NatPrf (E0 a) where
   smallEl _ = E0 small
-\end{spec}
+\end{code}
 %endif
 
 \subsection{Fold}
