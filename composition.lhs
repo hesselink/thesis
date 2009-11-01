@@ -210,10 +210,10 @@ data Comp f (phi :: * -> (* -> *) -> *) (xi :: * -> *) g (r :: * -> *) ix =
   Comp { unComp :: (f F.I0 (g r ix) xi) }
 \end{code}
 
-It take four type arguments in addition to the |r| and |ix| that all
-functors take. The first, |f|, is the functor representing a data type
-of kind |* -> *|. The second |phi|, is the family it belongs, with
-|xi| indicating its index within the family. Finally, |g| is the
+|Comp| takes four type arguments in addition to the |r| and |ix| that
+all functors take. The first, |f|, is the functor representing a data
+type of kind |* -> *|. The second, |phi|, is the family it belongs to,
+with |xi| indicating its index within the family. Finally, |g| is the
 functor representing a data type of kind |*| that is used at the
 element positions of |f|.
 

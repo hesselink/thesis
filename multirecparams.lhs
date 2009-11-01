@@ -749,13 +749,18 @@ instance Small a => SmallEl NatPrf (E0 a) where
 
 \subsection{Fold}
 
-In multirec, it is possible to define a fold function that is very
-similar in its use to a hand-written fold on a data type. It takes an
-algebra that contains a tuple with an algebra for each data type. Each
-of these contains another tuple, with a function for each constructor.
-These functions take an argument for each value in the constructor,
-and produces a result. The fold also takes a value, and applies the
-algebra to obtain a final result.
+The well-known fold function \cite{huttonfold, malcolmfold} can be
+elegantly defined in multirec, in a way that is very similar in its
+use to a hand-written fold on a data type. In this section, we will
+first introduce its definition in multirec, and then show how it can
+be extended to parametrized datatypes.
+
+The fold function in multirec takes an algebra, which is a tuple with
+an algebra for each data type in the family. Each of these algebras is
+another tuple, with a function for each constructor.  These functions
+take an argument for each value in the constructor, and produce a
+result. In addition to the algebra, the fold takes a value, and
+applies the algebra to obtain a final result.
 
 The type of the algebra depends on the data type. We use a type family
 to encode this. It takes the functor representing the data type, the
@@ -795,8 +800,8 @@ instance Fold (I xi) where
 
 We can now write a top level function that applies an algebra to a
 value. It does this by first converting to the generic representation,
-mapping the fold on all recursive positions, and the applying the
-algebra on the top level functor.
+mapping the fold on all recursive positions, and then applying the
+algebra to the top level functor.
 
 \begin{spec}
 fold ::  forall phi ix r . (Fam phi, HFunctor phi (PF phi), Fold (PF phi)) =>
@@ -923,9 +928,9 @@ fold f p =  alg (f p) .
     rec _ (R0 p x) = fold f p x
 \end{spec}
 
-We can now write very natural algebras. For example, if we represent
-the trees from Section \ref{sec:multiparam}, we can write an algebra
-over them like this:
+We can now write algebras in the usual way. For example, if we
+consider the trees from Section \ref{sec:multiparam}, we can write
+algebras over them like this:
 
 \begin{spec}
 treeAlg :: Algebra TreeU (Int :|: String :|: Nil) Int
